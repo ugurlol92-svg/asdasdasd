@@ -1,192 +1,1122 @@
-/* =========================================================
-   Bayramov Theme — Product page JS
-   Gallery, variant picker, add to cart
-   ========================================================= */
-(function () {
-  'use strict';
+import { Component } from '@theme/component';
+import { fetchConfig, preloadImage, onAnimationEnd, yieldToMainThread, parseIntOrDefault } from '@theme/utilities';
+import { cartPerformance } from '@theme/performance';
+import { morph } from '@theme/morph';
+import { CartLinesUpdateEvent, CartErrorEvent, ProductSelectEvent, StandardEvents } from '@shopify/events';
+import { resolveVariantId } from '@theme/variant-resolution';
 
-  function qs(sel, ctx) { return (ctx || document).querySelector(sel); }
-  function qsa(sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); }
+// Error message display duration - gives users time to read the message
+const ERROR_MESSAGE_DISPLAY_DURATION = 10000;
 
-  function formatMoney(cents, format) {
-    if (typeof cents !== 'number') cents = parseInt(cents, 10) || 0;
-    format = format || (window.Bayramov && window.Bayramov.moneyFormat) || '{{amount}}';
-    var value;
-    function defaultTo(a, b) { return isNaN(a) ? b : a; }
-    function formatWithDelimiters(number, precision, thousands, decimal) {
-      precision = defaultTo(precision, 2);
-      thousands = thousands || ',';
-      decimal = decimal || '.';
-      if (isNaN(number)) return 0;
-      number = (number / 100.0).toFixed(precision);
-      var parts = number.split('.');
-      var dollars = parts[0].replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + thousands);
-      var cents2 = parts[1] ? decimal + parts[1] : '';
-      return dollars + cents2;
-    }
-    var match = format.match(/\{\{\s*(\w+)\s*\}\}/);
-    var placeholder = match ? match[1] : 'amount';
-    switch (placeholder) {
-      case 'amount': value = formatWithDelimiters(cents, 2); break;
-      case 'amount_no_decimals': value = formatWithDelimiters(cents, 0); break;
-      case 'amount_with_comma_separator': value = formatWithDelimiters(cents, 2, '.', ','); break;
-      case 'amount_no_decimals_with_comma_separator': value = formatWithDelimiters(cents, 0, '.', ','); break;
-      default: value = formatWithDelimiters(cents, 2);
-    }
-    return format.replace(match ? match[0] : '{{amount}}', value);
+// Button re-enable delay after error - prevents rapid repeat attempts
+const ERROR_BUTTON_REENABLE_DELAY = 1000;
+
+// Success message display duration for screen readers
+const SUCCESS_MESSAGE_DISPLAY_DURATION = 5000;
+
+/**
+ * @typedef {HTMLElement & {
+ *   source: Element,
+ *   destination: Element,
+ *   useSourceSize: string | boolean
+ * }} FlyToCart
+ */
+
+/**
+ * A custom element that manages an add to cart button.
+ *
+ * @typedef {object} AddToCartRefs
+ * @property {HTMLButtonElement} addToCartButton - The add to cart button.
+ * @extends Component<AddToCartRefs>
+ */
+export class AddToCartComponent extends Component {
+  requiredRefs = ['addToCartButton'];
+
+  /** @type {number[] | undefined} */
+  #resetTimeouts = /** @type {number[]} */ ([]);
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    this.addEventListener('pointerenter', this.#preloadImage);
   }
 
-  qsa('product-info[data-product-info-root]').forEach(function (root) {
-    var jsonScript = qs('[data-product-json]', root);
-    if (!jsonScript) return;
-    var variants;
-    try { variants = JSON.parse(jsonScript.textContent); } catch (e) { variants = []; }
+  disconnectedCallback() {
+    super.disconnectedCallback();
 
-    var optionGroups = qsa('[data-option-index]', root);
-    var selected = {};
-    optionGroups.forEach(function (group) {
-      var active = qs('.is-active', group);
-      if (active) selected[group.getAttribute('data-option-index')] = active.getAttribute('data-option-value');
-    });
+    if (this.#resetTimeouts) {
+      this.#resetTimeouts.forEach(/** @param {number} timeoutId */ (timeoutId) => clearTimeout(timeoutId));
+    }
+    this.removeEventListener('pointerenter', this.#preloadImage);
+  }
 
-    function findVariant() {
-      return variants.find(function (v) {
-        var opts = [v.option1, v.option2, v.option3];
-        return Object.keys(selected).every(function (idx) {
-          return opts[parseInt(idx, 10)] === selected[idx];
-        });
-      });
+  /**
+   * Disables the add to cart button.
+   */
+  disable() {
+    this.refs.addToCartButton.disabled = true;
+  }
+
+  /**
+   * Enables the add to cart button.
+   */
+  enable() {
+    this.refs.addToCartButton.disabled = false;
+  }
+
+  /**
+   * Handles the click event for the add to cart button.
+   * @param {MouseEvent & {target: HTMLElement}} event - The click event.
+   */
+  handleClick(event) {
+    const form = this.closest('form');
+    if (!form?.checkValidity()) return;
+
+    // Check if adding would exceed max before animating
+    const productForm = /** @type {ProductFormComponent | null} */ (this.closest('product-form-component'));
+    const quantitySelector = productForm?.refs.quantitySelector;
+    if (quantitySelector?.canAddToCart) {
+      const validation = quantitySelector.canAddToCart();
+      // Don't animate if it would exceed max
+      if (!validation.canAdd) {
+        return;
+      }
+    }
+    if (this.refs.addToCartButton.dataset.puppet !== 'true') {
+      const animationEnabled = this.dataset.addToCartAnimation === 'true';
+      if (animationEnabled && !event.target.closest('.quick-add-modal')) {
+        this.#animateFlyToCart();
+      }
+      this.animateAddToCart();
+    }
+  }
+
+  #preloadImage = () => {
+    const image = this.dataset.productVariantMedia;
+
+    if (!image) return;
+
+    preloadImage(image);
+  };
+
+  /**
+   * Animates the fly to cart animation.
+   */
+  #animateFlyToCart() {
+    const { addToCartButton } = this.refs;
+    const cartIcon = document.querySelector('.header-actions__cart-icon');
+
+    const image = this.dataset.productVariantMedia;
+
+    if (!cartIcon || !addToCartButton || !image) return;
+
+    const flyToCartElement = /** @type {FlyToCart} */ (document.createElement('fly-to-cart'));
+
+    let flyToCartClass = addToCartButton.classList.contains('quick-add__button')
+      ? 'fly-to-cart--quick'
+      : 'fly-to-cart--main';
+
+    flyToCartElement.classList.add(flyToCartClass);
+    flyToCartElement.style.setProperty('background-image', `url(${image})`);
+    flyToCartElement.style.setProperty('--start-opacity', '0');
+    flyToCartElement.source = addToCartButton;
+    flyToCartElement.destination = cartIcon;
+
+    document.body.appendChild(flyToCartElement);
+  }
+
+  /**
+   * Animates the add to cart button.
+   */
+  animateAddToCart = async function () {
+    const { addToCartButton } = this.refs;
+
+    // Initialize the array if it doesn't exist
+    if (!this.#resetTimeouts) {
+      this.#resetTimeouts = [];
     }
 
-    function updateUI(variant) {
-      var addBtn = qs('[data-add-to-cart]', root);
-      var addText = qs('[data-add-to-cart-text]', root);
-      var hiddenInput = qs('[data-selected-variant-id]', root);
-      var priceBlock = qs('[data-product-price]', root);
+    // Clear all existing timeouts
+    this.#resetTimeouts.forEach(/** @param {number} timeoutId */ (timeoutId) => clearTimeout(timeoutId));
+    this.#resetTimeouts = [];
 
-      if (!variant) {
-        if (addBtn) addBtn.disabled = true;
-        if (addText) addText.textContent = window.Bayramov.strings.soldOut;
+    if (addToCartButton.dataset.added !== 'true') {
+      addToCartButton.dataset.added = 'true';
+    }
+
+    // The onAnimationEnd can trigger a style recalculation so we yield to the main thread first.
+    await yieldToMainThread();
+    await onAnimationEnd(addToCartButton);
+
+    // Create new timeout and store it in the array
+    const timeoutId = setTimeout(() => {
+      addToCartButton.removeAttribute('data-added');
+
+      // Remove this timeout from the array
+      const index = this.#resetTimeouts.indexOf(timeoutId);
+      if (index > -1) {
+        this.#resetTimeouts.splice(index, 1);
+      }
+    }, 800);
+
+    this.#resetTimeouts.push(timeoutId);
+  };
+}
+
+if (!customElements.get('add-to-cart-component')) {
+  customElements.define('add-to-cart-component', AddToCartComponent);
+}
+
+/**
+ * A custom element that manages a product form.
+ *
+ * @typedef {{items: Array<{quantity: number, variant_id: number}>}} Cart
+ *
+ * @typedef {object} ProductFormRefs
+ * @property {HTMLInputElement} variantId - The form input for submitting the variant ID.
+ * @property {AddToCartComponent | undefined} addToCartButtonContainer - The add to cart button container element.
+ * @property {HTMLElement | undefined} addToCartTextError - The add to cart text error.
+ * @property {HTMLElement | undefined} acceleratedCheckoutButtonContainer - The accelerated checkout button container element.
+ * @property {HTMLElement} liveRegion - The live region.
+ * @property {HTMLElement | undefined} quantityLabelCartCount - The quantity label cart count element.
+ * @property {HTMLElement | undefined} quantityRules - The quantity rules element.
+ * @property {HTMLElement | undefined} productFormButtons - The product form buttons container.
+ * @property {HTMLElement | undefined} volumePricing - The volume pricing component.
+ * @property {any | undefined} quantitySelector - The quantity selector component.
+ * @property {HTMLElement | undefined} quantitySelectorWrapper - The quantity selector wrapper element.
+ * @property {HTMLElement | undefined} quantityLabel - The quantity label element.
+ * @property {HTMLElement | undefined} pricePerItem - The price per item component.
+ *
+ * @typedef {object} QueuedAddToCartItem
+ * @property {number} quantity - The quantity captured when Add was clicked.
+ * @property {number} generation - The variant-change generation active when Add was clicked.
+ * @property {string | null} intendedVariantId - The selected option's data-variant-id, when present.
+ * @property {Promise<unknown> | null} pendingVariantChange - The server-side section fetch for the clicked selection.
+ * @property {string | null} variantResolutionUrl - A section-rendering URL that resolves the clicked selection.
+ *
+ * @typedef {object} QuantityConstraints
+ * @property {string} min
+ * @property {string | null} max
+ * @property {string} step
+ * @property {string | null} cartQuantity
+ *
+ * @extends Component<ProductFormRefs>
+ */
+class ProductFormComponent extends Component {
+  requiredRefs = ['variantId', 'liveRegion'];
+  #abortController = new AbortController();
+
+  /** @type {number | undefined} */
+  #timeout;
+
+  /** @type {boolean} */
+  #variantChangeInProgress = false;
+
+  /** @type {number} */
+  #variantChangeGeneration = 0;
+
+  /**
+   * Adds queued while a variant change is in flight. Each entry captures the selection state and
+   * generation active when Add was clicked, then resolves that selection at drain time.
+   * @type {QueuedAddToCartItem[]}
+   */
+  #addToCartQueue = [];
+
+  /**
+   * The in-flight variant-change section fetch promise. The queue drain awaits this before
+   * reading the resolved variant id.
+   * @type {Promise<unknown> | null}
+   */
+  #pendingVariantChange = null;
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    const { signal } = this.#abortController;
+    const target = this.closest('.shopify-section, dialog, product-card');
+    target?.addEventListener(StandardEvents.productSelect, this.#onProductSelect, { signal });
+
+    // Listen for cart updates to sync data-cart-quantity
+    document.addEventListener(StandardEvents.cartLinesUpdate, this.#onCartUpdate, { signal });
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+
+    this.#abortController.abort();
+  }
+
+  #getVariantIdInput() {
+    return /** @type {HTMLInputElement | null} */ (this.querySelector('input[name="id"]'))?.value;
+  }
+
+  async #refreshCart() {
+    /** @type {import('@theme/component-cart-items').CartItemsComponent | null} */
+    const cartItemsComponent = document.querySelector('cart-items-component');
+
+    if (cartItemsComponent) {
+      await customElements.whenDefined('cart-items-component');
+      return cartItemsComponent.fetchCartData();
+    }
+
+    // Fallback for pages without cart-items-component (e.g. page-based cart on product pages)
+    return fetch(`${Theme.routes.cart_url}.json`, {
+      headers: { Accept: 'application/json' },
+      credentials: 'same-origin',
+    }).then((response) => {
+      if (!response.ok) throw new Error(`Failed to fetch cart: ${response.status}`);
+      return response.json();
+    });
+  }
+
+  /**
+   * Updates quantity selector with cart data for current variant
+   * @param {Cart} cart - The cart object with items array
+   */
+  #updateCartQuantity(cart) {
+    const variantIdInput = this.#getVariantIdInput();
+    if (!variantIdInput) return;
+
+    const cartItem = cart.items.find(
+      /** @param {any} item */
+      (item) => item.variant_id.toString() === variantIdInput.toString()
+    );
+    const cartQty = cartItem ? cartItem.quantity : 0;
+
+    // Use public API to update quantity selector
+    const quantitySelector =
+      /** @type {import('@theme/component-cart-quantity-selector').CartQuantitySelectorComponent | null} */ (
+        this.querySelector('quantity-selector-component')
+      );
+
+    if (quantitySelector?.setCartQuantity) {
+      quantitySelector.setCartQuantity(cartQty);
+    }
+
+    // Update quantity label if it exists
+    this.#updateQuantityLabel(cartQty);
+  }
+
+  /**
+   * Updates data-cart-quantity when cart is updated from elsewhere
+   * @param {CartLinesUpdateEvent} event
+   */
+  #onCartUpdate = async (event) => {
+    if (!this.#getVariantIdInput()) return;
+
+    event.promise
+      ?.then(({ detail }) => {
+        // Skip if this event came from this component
+        if (detail?.sourceId === this.id || detail?.source === 'product-form-component') return;
+
+        if (detail?.items) {
+          this.#updateCartQuantity(/** @type {Cart} */ ({ items: detail.items }));
+        } else {
+          this.#refreshCart().then((cart) => this.#updateCartQuantity(cart));
+        }
+      })
+      .catch((error) => {
+        if (error?.name !== 'AbortError') console.warn('[product-form] Event promise rejected:', error);
+      });
+  };
+
+  /** @param {Event} event */
+  handleSubmit(event) {
+    event.preventDefault();
+
+    if (this.#variantChangeInProgress) {
+      this.#addToCartQueue.push(this.#createQueuedAddToCartItem());
+      this.refs.addToCartButtonContainer?.animateAddToCart?.();
+      return;
+    }
+
+    this.#processAddToCart(undefined, undefined, event);
+  }
+
+  /** @returns {number} */
+  #getQuantity() {
+    return Number(this.refs.quantitySelector?.getValue?.()) || Number(this.dataset.quantityDefault) || 1;
+  }
+
+  /** @returns {QueuedAddToCartItem} */
+  #createQueuedAddToCartItem() {
+    const picker = this.#getVariantPicker();
+    const selectedOption = picker?.selectedOption;
+
+    return {
+      quantity: this.#getQuantity(),
+      generation: this.#variantChangeGeneration,
+      intendedVariantId: selectedOption?.dataset.variantId ?? null,
+      pendingVariantChange: this.#pendingVariantChange,
+      variantResolutionUrl: picker && selectedOption ? picker.buildRequestUrl(selectedOption) : null,
+    };
+  }
+
+  /**
+   * @param {string} [overrideVariantId]
+   * @param {number} [overrideQuantity]
+   * @param {Event} [event]
+   */
+  #processAddToCart(overrideVariantId, overrideQuantity, event) {
+    const { addToCartTextError } = this.refs;
+
+    if (this.#timeout) clearTimeout(this.#timeout);
+
+    const allAddToCartContainers = /** @type {NodeListOf<AddToCartComponent>} */ (
+      this.querySelectorAll('add-to-cart-component')
+    );
+
+    if (!overrideVariantId) {
+      const anyButtonDisabled = Array.from(allAddToCartContainers).some(
+        (container) => container.refs.addToCartButton?.disabled
+      );
+      if (anyButtonDisabled) return;
+    }
+
+    const form = this.querySelector('form');
+    if (!form) throw new Error('Product form element missing');
+
+    if (!overrideVariantId && this.refs.quantitySelector?.canAddToCart) {
+      const validation = this.refs.quantitySelector.canAddToCart();
+
+      if (!validation.canAdd) {
+        for (const container of allAddToCartContainers) {
+          container.disable();
+        }
+
+        const errorTemplate = this.dataset.quantityErrorMax || '';
+        const errorMessage = errorTemplate.replace('{{ maximum }}', validation.maxQuantity?.toString() || '');
+        if (addToCartTextError) {
+          addToCartTextError.classList.remove('hidden');
+
+          const textNode = addToCartTextError.childNodes[2];
+          if (textNode) {
+            textNode.textContent = errorMessage;
+          } else {
+            const newTextNode = document.createTextNode(errorMessage);
+            addToCartTextError.appendChild(newTextNode);
+          }
+
+          this.#setLiveRegionText(errorMessage);
+
+          if (this.#timeout) clearTimeout(this.#timeout);
+          this.#timeout = setTimeout(() => {
+            if (!addToCartTextError) return;
+            addToCartTextError.classList.add('hidden');
+            this.#clearLiveRegionText();
+          }, ERROR_MESSAGE_DISPLAY_DURATION);
+        }
+
+        setTimeout(() => {
+          for (const container of allAddToCartContainers) {
+            container.enable();
+          }
+        }, ERROR_BUTTON_REENABLE_DELAY);
+
+        return;
+      }
+    }
+
+    const formData = new FormData(form);
+
+    if (overrideVariantId) {
+      formData.set('id', overrideVariantId);
+    }
+    if (overrideQuantity !== undefined) {
+      formData.set('quantity', overrideQuantity.toString());
+    }
+
+    const cartItemsComponents = document.querySelectorAll('cart-items-component');
+    let cartItemComponentsSectionIds = [];
+    cartItemsComponents.forEach((item) => {
+      if (item instanceof HTMLElement && item.dataset.sectionId) {
+        cartItemComponentsSectionIds.push(item.dataset.sectionId);
+      }
+      formData.append('sections', cartItemComponentsSectionIds.join(','));
+    });
+
+    const itemCount = Number(formData.get('quantity')) || Number(this.dataset.quantityDefault);
+    const deferredEventPromise = CartLinesUpdateEvent.createPromise();
+
+    this.dispatchEvent(
+      new CartLinesUpdateEvent({
+        action: 'add',
+        context: 'product',
+        lines: [
+          {
+            merchandiseId: /** @type {string} */ (formData.get('id')),
+            quantity: itemCount,
+          },
+        ],
+        promise: deferredEventPromise.promise,
+      })
+    );
+
+    const fetchCfg = fetchConfig('javascript', { body: formData });
+
+    fetch(Theme.routes.cart_add_url, {
+      ...fetchCfg,
+      headers: {
+        ...fetchCfg.headers,
+        Accept: 'text/html',
+      },
+    })
+      .then((response) => response.json())
+      .then(async (response) => {
+        if (response.status) {
+          this.dispatchEvent(
+            new CartErrorEvent({
+              error: response.message || 'Add to cart failed',
+              code: 'INVALID',
+              detail: {
+                description: response.description,
+                errors: response.errors,
+              },
+            })
+          );
+
+          // Fetch the updated cart to get the actual total quantity for this variant
+          this.#refreshCart()
+            .then((ajaxCart) =>
+              deferredEventPromise.resolve({
+                cart: CartLinesUpdateEvent.createCartFromAjaxResponse(ajaxCart),
+                detail: {
+                  didError: true,
+                  items: ajaxCart.items,
+                  source: 'product-form-component',
+                  sourceId: this.id.toString(),
+                  itemCount,
+                  productId: this.dataset.productId,
+                },
+              })
+            )
+            .catch(deferredEventPromise.reject);
+
+          if (!addToCartTextError) return;
+          addToCartTextError.classList.remove('hidden');
+
+          // Reuse the text node if the user is spam-clicking
+          const textNode = addToCartTextError.childNodes[2];
+          if (textNode) {
+            textNode.textContent = response.message;
+          } else {
+            const newTextNode = document.createTextNode(response.message);
+            addToCartTextError.appendChild(newTextNode);
+          }
+
+          // Create or get existing error live region for screen readers
+          this.#setLiveRegionText(response.message);
+
+          this.#timeout = setTimeout(() => {
+            if (!addToCartTextError) return;
+            addToCartTextError.classList.add('hidden');
+
+            // Clear the announcement
+            this.#clearLiveRegionText();
+          }, ERROR_MESSAGE_DISPLAY_DURATION);
+
+          return;
+        } else {
+          const id = formData.get('id');
+
+          if (addToCartTextError) {
+            addToCartTextError.classList.add('hidden');
+            addToCartTextError.removeAttribute('aria-live');
+          }
+
+          if (!id) throw new Error('Form ID is required');
+
+          // Add aria-live region to inform screen readers that the item was added
+          // Get the added text from any add-to-cart button
+          const anyAddToCartButton = allAddToCartContainers[0]?.refs.addToCartButton;
+          if (anyAddToCartButton) {
+            const addedTextElement = anyAddToCartButton.querySelector('.add-to-cart-text--added');
+            const addedText = addedTextElement?.textContent?.trim() || Theme.translations.added;
+
+            this.#setLiveRegionText(addedText);
+
+            setTimeout(() => {
+              this.#clearLiveRegionText();
+            }, SUCCESS_MESSAGE_DISPLAY_DURATION);
+          }
+
+          // Fetch the updated cart to get the actual total quantity for this variant
+          const cart = await this.#refreshCart()
+            .then((ajaxCart) => {
+              deferredEventPromise.resolve({
+                cart: CartLinesUpdateEvent.createCartFromAjaxResponse(ajaxCart),
+                detail: {
+                  items: ajaxCart.items,
+                  source: 'product-form-component',
+                  sourceId: this.id.toString(),
+                  itemCount,
+                  productId: this.dataset.productId,
+                  sections: response.sections,
+                  didError: false,
+                },
+              });
+
+              if (this.#getVariantIdInput()) {
+                this.#updateCartQuantity(ajaxCart);
+              }
+
+              return ajaxCart;
+            })
+            .catch(deferredEventPromise.reject);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        deferredEventPromise.reject(error);
+
+        this.dispatchEvent(
+          new CartErrorEvent({
+            error: error?.message || 'Network error during add to cart',
+            code: 'SERVICE_UNAVAILABLE',
+          })
+        );
+      })
+      .finally(() => {
+        if (event) {
+          cartPerformance.measureFromEvent('add:user-action', event);
+        }
+      });
+  }
+
+  /** @param {Array<{variantId: string, quantity: number}>} items */
+  #processBatchAddToCart(items) {
+    if (items.length === 0) return;
+
+    const { addToCartTextError } = this.refs;
+
+    if (this.#timeout) clearTimeout(this.#timeout);
+
+    const cartItemsComponents = document.querySelectorAll('cart-items-component');
+    const cartItemComponentsSectionIds = [];
+    for (const item of cartItemsComponents) {
+      if (item instanceof HTMLElement && item.dataset.sectionId) {
+        cartItemComponentsSectionIds.push(item.dataset.sectionId);
+      }
+    }
+
+    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+    const deferredEventPromise = CartLinesUpdateEvent.createPromise();
+
+    this.dispatchEvent(
+      new CartLinesUpdateEvent({
+        action: 'add',
+        context: 'product',
+        lines: items.map((item) => ({
+          merchandiseId: item.variantId,
+          quantity: item.quantity,
+        })),
+        promise: deferredEventPromise.promise,
+      })
+    );
+
+    const payload = {
+      items: items.map((item) => ({
+        id: Number(item.variantId),
+        quantity: item.quantity,
+      })),
+      sections: cartItemComponentsSectionIds.join(','),
+    };
+
+    fetch(Theme.routes.cart_add_url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => response.json())
+      .then(async (response) => {
+        if (response.status) {
+          this.dispatchEvent(
+            new CartErrorEvent({
+              error: response.message || 'Add to cart failed',
+              code: 'INVALID',
+              detail: {
+                description: response.description,
+                errors: response.errors,
+              },
+            })
+          );
+
+          this.#refreshCart()
+            .then((ajaxCart) =>
+              deferredEventPromise.resolve({
+                cart: CartLinesUpdateEvent.createCartFromAjaxResponse(ajaxCart),
+                detail: {
+                  didError: true,
+                  items: ajaxCart.items,
+                  source: 'product-form-component',
+                  sourceId: this.id.toString(),
+                  itemCount: totalQuantity,
+                  productId: this.dataset.productId,
+                },
+              })
+            )
+            .catch(deferredEventPromise.reject);
+
+          if (!addToCartTextError) return;
+          addToCartTextError.classList.remove('hidden');
+          const textNode = addToCartTextError.childNodes[2];
+          if (textNode) {
+            textNode.textContent = response.message;
+          } else {
+            addToCartTextError.appendChild(document.createTextNode(response.message));
+          }
+          this.#setLiveRegionText(response.message);
+
+          this.#timeout = setTimeout(() => {
+            addToCartTextError.classList.add('hidden');
+            this.#clearLiveRegionText();
+          }, ERROR_MESSAGE_DISPLAY_DURATION);
+
+          return;
+        }
+
+        if (addToCartTextError) {
+          addToCartTextError.classList.add('hidden');
+          addToCartTextError.removeAttribute('aria-live');
+        }
+
+        const allAddToCartContainers = /** @type {NodeListOf<AddToCartComponent>} */ (
+          this.querySelectorAll('add-to-cart-component')
+        );
+        const anyAddToCartButton = allAddToCartContainers[0]?.refs.addToCartButton;
+        if (anyAddToCartButton) {
+          const addedTextElement = anyAddToCartButton.querySelector('.add-to-cart-text--added');
+          const addedText = addedTextElement?.textContent?.trim() || Theme.translations.added;
+          this.#setLiveRegionText(addedText);
+          setTimeout(() => this.#clearLiveRegionText(), SUCCESS_MESSAGE_DISPLAY_DURATION);
+        }
+
+        const cart = await this.#refreshCart();
+        deferredEventPromise.resolve({
+          cart: CartLinesUpdateEvent.createCartFromAjaxResponse(cart),
+          detail: {
+            items: cart.items,
+            source: 'product-form-component',
+            sourceId: this.id.toString(),
+            itemCount: totalQuantity,
+            productId: this.dataset.productId,
+            sections: response.sections,
+            didError: false,
+          },
+        });
+        this.#updateCartQuantity(cart);
+      })
+      .catch((error) => {
+        console.error(error);
+        deferredEventPromise.reject(error);
+
+        this.dispatchEvent(
+          new CartErrorEvent({
+            error: error?.message || 'Network error during add to cart',
+            code: 'SERVICE_UNAVAILABLE',
+          })
+        );
+      });
+  }
+
+  /**
+   * Updates the quantity label with the current cart quantity
+   * @param {number} cartQty - The quantity in cart
+   */
+  #updateQuantityLabel(cartQty) {
+    const quantityLabel = this.refs.quantityLabelCartCount;
+    if (quantityLabel) {
+      const inCartText = quantityLabel.textContent?.match(/\((\d+)\s+(.+)\)/);
+      if (inCartText && inCartText[2]) {
+        quantityLabel.textContent = `(${cartQty} ${inCartText[2]})`;
+      }
+
+      // Show/hide based on quantity
+      quantityLabel.classList.toggle('hidden', cartQty === 0);
+    }
+  }
+
+  /**
+   * @param {*} text
+   */
+  #setLiveRegionText(text) {
+    const liveRegion = this.refs.liveRegion;
+    liveRegion.textContent = text;
+  }
+
+  #clearLiveRegionText() {
+    const liveRegion = this.refs.liveRegion;
+    liveRegion.textContent = '';
+  }
+
+  /**
+   * Morphs or removes/adds an element based on current and new element states
+   * @param {Element | null | undefined} currentElement - The current element in the DOM
+   * @param {Element | null | undefined} newElement - The new element from the server response
+   * @param {Element | null} [insertReferenceElement] - Element to insert before if adding new element
+   */
+  #morphOrUpdateElement(currentElement, newElement, insertReferenceElement = null) {
+    if (currentElement && newElement) {
+      morph(currentElement, newElement);
+    } else if (currentElement && !newElement) {
+      currentElement.remove();
+    } else if (!currentElement && newElement && insertReferenceElement) {
+      insertReferenceElement.insertAdjacentElement('beforebegin', /** @type {Element} */ (newElement.cloneNode(true)));
+    }
+  }
+
+  /**
+   * @param {ProductSelectEvent} event
+   */
+  #onProductSelect = async (event) => {
+    // Skip events from product-cards when this form is at the section level
+    const sourceCard = /** @type {Element | null} */ (event.target)?.closest('product-card');
+    if (sourceCard && !sourceCard.contains(this)) return;
+
+    // Track generation to prevent a stale (aborted) call from clearing the flag
+    // while a newer variant selection is still pending.
+    const generation = ++this.#variantChangeGeneration;
+    this.#variantChangeInProgress = true;
+    // Hold the in-flight section-fetch promise so the queue drain can await it before reading the
+    // resolved variant id.
+    this.#pendingVariantChange = event.promise;
+
+    try {
+      const { detail } = await event.promise;
+      if (!detail?.html) return;
+
+      const { html, newProduct, productId, resource } = detail;
+
+      // Update product context if new product loaded (combined listing)
+      if (newProduct) {
+        this.dataset.productId = newProduct.id;
+      } else if (productId && productId !== this.dataset.productId) {
         return;
       }
 
-      if (hiddenInput) hiddenInput.value = variant.id;
+      const { variantId } = this.refs;
+      variantId.value = resource?.id ?? '';
 
-      if (history.replaceState) {
-        var url = new URL(window.location.href);
-        url.searchParams.set('variant', variant.id);
-        history.replaceState({}, '', url);
+      const { addToCartButtonContainer: currentAddToCartButtonContainer, acceleratedCheckoutButtonContainer } =
+        this.refs;
+      const currentAddToCartButton = currentAddToCartButtonContainer?.refs.addToCartButton;
+
+      // Update state and text for add-to-cart button
+      if (!currentAddToCartButtonContainer || (!currentAddToCartButton && !acceleratedCheckoutButtonContainer)) return;
+
+      // Update the button state
+      if (resource == null || resource.available == false) {
+        currentAddToCartButtonContainer.disable();
+      } else {
+        currentAddToCartButtonContainer.enable();
       }
 
-      if (priceBlock) {
-        var onSale = variant.compare_at_price && variant.compare_at_price > variant.price;
-        var html = '<div class="price ' + (onSale ? 'price--on-sale' : '') + '">';
-        if (!variant.available) {
-          html += '<span class="price__badge price__badge--sold-out">' + window.Bayramov.strings.soldOut + '</span>';
-        }
-        html += '<span class="price__container">';
-        if (onSale) {
-          html += '<s class="price__compare-at">' + formatMoney(variant.compare_at_price) + '</s>';
-          html += '<span class="price__sale">' + formatMoney(variant.price) + '</span>';
+      const newAddToCartButton = html.querySelector('product-form-component [ref="addToCartButton"]');
+      if (newAddToCartButton && currentAddToCartButton) {
+        morph(currentAddToCartButton, newAddToCartButton);
+      }
+
+      if (acceleratedCheckoutButtonContainer) {
+        if (resource == null || resource.available == false) {
+          acceleratedCheckoutButtonContainer?.setAttribute('hidden', 'true');
         } else {
-          html += '<span class="price__regular">' + formatMoney(variant.price) + '</span>';
+          acceleratedCheckoutButtonContainer?.removeAttribute('hidden');
         }
-        html += '</span></div>';
-        priceBlock.innerHTML = html;
       }
 
-      if (addBtn) addBtn.disabled = !variant.available;
-      if (addText) addText.textContent = variant.available ? window.Bayramov.strings.addToCart : window.Bayramov.strings.soldOut;
-
-      if (variant.featured_media) {
-        var layoutRoot = root.closest('.product-layout');
-        var slide = layoutRoot && qs('[data-gallery-slide][data-media-id="' + variant.featured_media.id + '"]', layoutRoot);
-        if (slide && window.BayramovGallery) {
-          window.BayramovGallery.goTo(parseInt(slide.getAttribute('data-index'), 10));
+      // Set the data attribute for the product variant media if it exists
+      if (resource) {
+        const productVariantMedia = resource.featured_media?.preview_image?.src;
+        if (productVariantMedia) {
+          this.refs.addToCartButtonContainer?.setAttribute(
+            'data-product-variant-media',
+            productVariantMedia + '&width=100'
+          );
         }
+      }
+
+      // Check if quantity rules, price-per-item, or add-to-cart are appearing/disappearing (causes layout shift)
+      const {
+        quantityRules,
+        pricePerItem,
+        quantitySelector,
+        productFormButtons,
+        quantityLabel,
+        quantitySelectorWrapper,
+      } = this.refs;
+
+      // Update quantity selector's min/max/step attributes and cart quantity for the new variant
+      const newQuantityInput = /** @type {HTMLInputElement | null} */ (
+        html.querySelector('quantity-selector-component input[ref="quantityInput"]')
+      );
+
+      if (quantitySelector?.updateConstraints && newQuantityInput) {
+        quantitySelector.updateConstraints(newQuantityInput.min, newQuantityInput.max || null, newQuantityInput.step);
+        // Keep data-quantity-default attribute in sync with new variant's minimum quantity
+        this.dataset.quantityDefault = newQuantityInput.min || '1';
+      }
+
+      const newQuantityRules = html.querySelector('.quantity-rules');
+      const isQuantityRulesChanging = !!quantityRules !== !!newQuantityRules;
+
+      const newPricePerItem = html.querySelector('price-per-item');
+      const isPricePerItemChanging = !!pricePerItem !== !!newPricePerItem;
+
+      if ((isQuantityRulesChanging || isPricePerItemChanging) && quantitySelector) {
+        // Store quantity value before morphing entire container
+        const currentQuantityValue = quantitySelector.getValue?.();
+
+        const newProductFormButtons = html.querySelector('.product-form-buttons');
+
+        if (productFormButtons && newProductFormButtons) {
+          morph(productFormButtons, newProductFormButtons);
+
+          // Get the NEW quantity selector after morphing and update its constraints
+          const newQuantityInputElement = /** @type {HTMLInputElement | null} */ (
+            html.querySelector('quantity-selector-component input[ref="quantityInput"]')
+          );
+
+          if (this.refs.quantitySelector?.updateConstraints && newQuantityInputElement && currentQuantityValue) {
+            // Temporarily set the old value so updateConstraints can snap it properly
+            this.refs.quantitySelector.setValue(currentQuantityValue);
+            // updateConstraints will snap to valid increment if needed
+            this.refs.quantitySelector.updateConstraints(
+              newQuantityInputElement.min,
+              newQuantityInputElement.max || null,
+              newQuantityInputElement.step
+            );
+            // Keep data-quantity-default attribute in sync with new variant's minimum quantity
+            this.dataset.quantityDefault = newQuantityInputElement.min || '1';
+          }
+        }
+      } else {
+        // Update elements individually when layout isn't changing
+        /** @type {Array<[string, HTMLElement | undefined, HTMLElement | undefined]>} */
+        const morphTargets = [
+          ['.quantity-label', quantityLabel, quantitySelector],
+          ['.quantity-rules', quantityRules, this.refs.productFormButtons],
+          ['price-per-item', pricePerItem, quantitySelectorWrapper],
+        ];
+
+        for (const [selector, currentElement, fallback] of morphTargets) {
+          this.#morphOrUpdateElement(currentElement, html.querySelector(selector), fallback);
+        }
+      }
+
+      // Morph volume pricing if it exists
+      const currentVolumePricing = this.refs.volumePricing;
+      const newVolumePricing = html.querySelector('volume-pricing');
+      this.#morphOrUpdateElement(currentVolumePricing, newVolumePricing, this.refs.productFormButtons);
+
+      const hasB2BFeatures =
+        quantityRules ||
+        newQuantityRules ||
+        pricePerItem ||
+        newPricePerItem ||
+        currentVolumePricing ||
+        newVolumePricing;
+
+      if (!hasB2BFeatures) return;
+
+      // Fetch and update cart quantity for the new variant
+      this.#refreshCart().then((cart) => this.#updateCartQuantity(cart));
+    } finally {
+      // Only clear the flag if no newer variant selection has started
+      if (generation === this.#variantChangeGeneration) {
+        this.#variantChangeInProgress = false;
+
+        // Drain any queued add-to-cart requests that accumulated during the variant change
+        await this.#drainAddToCartQueue();
+      }
+    }
+  };
+
+  /**
+   * Drains the add-to-cart queue accumulated while a variant change was in flight.
+   *
+   * Each queued add resolves against the selection and generation that were active when Add was
+   * clicked. If no variant resolves, that queued add is aborted so a stale, empty, or maxed
+   * variant id is never sent. The add-to-cart button is already disabled for unavailable
+   * selections in #onProductSelect, so no further UI change is needed.
+   */
+  async #drainAddToCartQueue() {
+    if (this.#addToCartQueue.length === 0) return;
+
+    const queuedItems = [...this.#addToCartQueue];
+    this.#addToCartQueue = [];
+
+    /** @type {Array<{variantId: string, quantity: number}>} */
+    const resolvedItems = [];
+    for (const item of queuedItems) {
+      const resolvedItem = await this.#resolveQueuedAddToCartItem(item);
+      if (resolvedItem) {
+        resolvedItems.push(resolvedItem);
       }
     }
 
-    optionGroups.forEach(function (group) {
-      var buttons = qsa('.swatch, .pill', group);
-      buttons.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          buttons.forEach(function (b) { b.classList.remove('is-active'); });
-          btn.classList.add('is-active');
-          var idx = group.getAttribute('data-option-index');
-          selected[idx] = btn.getAttribute('data-option-value');
-          var label = qs('[data-selected-option-value]', group);
-          if (label) label.textContent = selected[idx];
-          updateUI(findVariant());
-        });
-      });
-    });
-  });
+    this.#processBatchAddToCart(resolvedItems);
+  }
 
-  /* ---------- Add to cart (AJAX) ---------- */
-  qsa('.product-form').forEach(function (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var btn = qs('[data-add-to-cart]', form);
-      var spinner = qs('[data-add-to-cart-spinner]', form);
-      var textEl = qs('[data-add-to-cart-text]', form);
-      if (btn) btn.disabled = true;
-      if (spinner) spinner.hidden = false;
-      var formData = new FormData(form);
-      fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { Accept: 'application/json' },
-        body: formData
-      })
-        .then(function (res) { return res.json(); })
-        .then(function (data) {
-          if (spinner) spinner.hidden = true;
-          if (data.status) {
-            if (btn) btn.disabled = false;
-            var errorMsg = data.description || 'Bir hata oluştu';
-            if (textEl) textEl.textContent = errorMsg;
-            setTimeout(function () { if (textEl) textEl.textContent = window.Bayramov.strings.addToCart; }, 2500);
-            return;
-          }
-          if (btn) btn.disabled = false;
-          if (window.BayramovCart && window.BayramovCart.refresh) window.BayramovCart.refresh();
-          if (window.Bayramov.cartType === 'drawer' && window.BayramovCart) {
-            window.BayramovCart.open();
-          } else {
-            window.location.href = window.Bayramov.routes.cart_url;
-          }
-        })
-        .catch(function () {
-          if (spinner) spinner.hidden = true;
-          if (btn) btn.disabled = false;
-        });
-    });
-  });
+  /**
+   * @param {QueuedAddToCartItem} item
+   * @returns {Promise<{variantId: string, quantity: number} | null>}
+   */
+  async #resolveQueuedAddToCartItem(item) {
+    const { variantId, quantityConstraints } = await this.#resolveQueuedVariant(item);
+    if (!variantId) return null;
 
-  /* ---------- Product gallery ---------- */
-  qsa('[data-product-gallery]').forEach(function (galleryRoot) {
-    var slides = qsa('[data-gallery-slide]', galleryRoot);
-    var thumbs = qsa('[data-gallery-thumb]', galleryRoot);
-    var prevBtn = qs('[data-gallery-prev]', galleryRoot);
-    var nextBtn = qs('[data-gallery-next]', galleryRoot);
-    var index = 0;
+    return {
+      variantId,
+      quantity: this.#normalizeQueuedQuantity(item.quantity, quantityConstraints),
+    };
+  }
 
-    function goTo(i) {
-      if (!slides.length) return;
-      slides[index].classList.add('hidden');
-      if (thumbs[index]) thumbs[index].classList.remove('is-active');
-      index = (i + slides.length) % slides.length;
-      slides[index].classList.remove('hidden');
-      if (thumbs[index]) thumbs[index].classList.add('is-active');
+  /**
+   * @param {QueuedAddToCartItem} item
+   * @returns {Promise<{variantId: string | null, quantityConstraints: QuantityConstraints | null}>}
+   */
+  async #resolveQueuedVariant(item) {
+    /** @type {string | null} */
+    let resolvedVariantId = null;
+    /** @type {boolean | undefined} */
+    let available;
+    /** @type {QuantityConstraints | null} */
+    let quantityConstraints = null;
+
+    if (item.pendingVariantChange) {
+      try {
+        const result = /** @type {{detail?: {resource?: any, html?: Document | Element}}} */ (
+          await item.pendingVariantChange
+        );
+        const resource = result?.detail?.resource;
+        quantityConstraints = this.#getQuantityConstraintsFromHtml(result?.detail?.html);
+        if (resource === null) {
+          available = false;
+        } else if (resource) {
+          resolvedVariantId = resource.id != null ? String(resource.id) : null;
+          available = resource.available !== false;
+        }
+      } catch {
+        const resolvedVariant = await this.#resolveVariantFromUrl(item.variantResolutionUrl).catch(() => ({
+          variantId: null,
+          available: false,
+          quantityConstraints: null,
+        }));
+        resolvedVariantId = resolvedVariant.variantId;
+        available = resolvedVariant.available;
+        quantityConstraints = resolvedVariant.quantityConstraints;
+      }
     }
 
-    if (prevBtn) prevBtn.addEventListener('click', function () { goTo(index - 1); });
-    if (nextBtn) nextBtn.addEventListener('click', function () { goTo(index + 1); });
-    thumbs.forEach(function (thumb, i) {
-      thumb.addEventListener('click', function () { goTo(i); });
+    const isLatestGeneration = item.generation === this.#variantChangeGeneration;
+    const variantId = resolveVariantId({
+      resolvedVariantId,
+      intendedVariantId: item.intendedVariantId,
+      hiddenInputValue: isLatestGeneration ? this.#getVariantIdInput() ?? null : null,
+      available: available ?? (isLatestGeneration ? !this.#isAddToCartDisabled() : undefined),
     });
 
-    window.BayramovGallery = window.BayramovGallery || {};
-    window.BayramovGallery.goTo = goTo;
-  });
-})();
+    return { variantId, quantityConstraints };
+  }
+
+  /**
+   * @param {number} quantity
+   * @param {QuantityConstraints | null} quantityConstraints
+   * @returns {number}
+   */
+  #normalizeQueuedQuantity(quantity, quantityConstraints) {
+    if (!quantityConstraints) return quantity;
+
+    const min = parseIntOrDefault(quantityConstraints.min, 1);
+    const max = parseIntOrDefault(quantityConstraints.max, null);
+    const step = parseIntOrDefault(quantityConstraints.step, 1);
+    const cartQuantity = parseIntOrDefault(quantityConstraints.cartQuantity, 0);
+    const effectiveMax = max === null ? null : Math.max(max - cartQuantity, min);
+
+    let normalizedQuantity = quantity;
+    if ((quantity - min) % step !== 0) {
+      normalizedQuantity = min + Math.floor((quantity - min) / step) * step;
+    }
+
+    return Math.max(min, Math.min(effectiveMax ?? Infinity, normalizedQuantity));
+  }
+
+  /**
+   * @param {Document | Element | null | undefined} html
+   * @returns {QuantityConstraints | null}
+   */
+  #getQuantityConstraintsFromHtml(html) {
+    const quantityInput = /** @type {HTMLInputElement | null} */ (
+      html?.querySelector?.('quantity-selector-component input[ref="quantityInput"]') ?? null
+    );
+    if (!quantityInput) return null;
+
+    return {
+      min: quantityInput.min,
+      max: quantityInput.max || null,
+      step: quantityInput.step,
+      cartQuantity: quantityInput.getAttribute('data-cart-quantity'),
+    };
+  }
+
+  /**
+   * Resolves a queued selection using the server-side section renderer when the original in-flight
+   * request was aborted by a later variant selection.
+   * @param {string | null} variantResolutionUrl
+   * @returns {Promise<{variantId: string | null, available: boolean | undefined, quantityConstraints: QuantityConstraints | null}>}
+   */
+  async #resolveVariantFromUrl(variantResolutionUrl) {
+    if (!variantResolutionUrl) return { variantId: null, available: undefined, quantityConstraints: null };
+
+    const response = await fetch(variantResolutionUrl, { credentials: 'same-origin' });
+    if (!response.ok) return { variantId: null, available: false, quantityConstraints: null };
+
+    const html = new DOMParser().parseFromString(await response.text(), 'text/html');
+    const quantityConstraints = this.#getQuantityConstraintsFromHtml(html);
+    const textContent = html.querySelector('variant-picker script[type="application/json"]')?.textContent;
+    if (!textContent) return { variantId: null, available: false, quantityConstraints };
+
+    const resource = JSON.parse(textContent);
+    if (!resource || typeof resource !== 'object') return { variantId: null, available: false, quantityConstraints };
+
+    return {
+      variantId: resource.id != null ? String(resource.id) : null,
+      available: resource.available !== false,
+      quantityConstraints,
+    };
+  }
+
+  /**
+   * @returns {import('@theme/variant-picker').default | null}
+   */
+  #getVariantPicker() {
+    const container = this.closest('product-card') ?? this.closest('dialog') ?? this.closest('.shopify-section');
+    const pickers = /** @type {import('@theme/variant-picker').default[]} */ (
+      Array.from(container?.querySelectorAll('variant-picker, swatches-variant-picker-component') ?? [])
+    );
+    const productId = this.dataset.productId;
+
+    if (productId) {
+      const matchingPicker = pickers.find((picker) => picker.dataset.productId === productId);
+      if (matchingPicker) return matchingPicker;
+    }
+
+    return pickers.length === 1 ? pickers[0] ?? null : null;
+  }
+
+  /**
+   * Whether the current selection's add-to-cart button is disabled (unavailable selection).
+   * @returns {boolean}
+   */
+  #isAddToCartDisabled() {
+    const containers = /** @type {NodeListOf<AddToCartComponent>} */ (this.querySelectorAll('add-to-cart-component'));
+    return Array.from(containers).some((container) => container.refs.addToCartButton?.disabled);
+  }
+}
+
+if (!customElements.get('product-form-component')) {
+  customElements.define('product-form-component', ProductFormComponent);
+}

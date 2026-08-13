@@ -1,190 +1,887 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
-    "slideshow": {
-      "type": "slideshow",
+    "hero_jVaWmY": {
+      "type": "hero",
+      "blocks": {
+        "text_YLPk4p": {
+          "type": "text",
+          "name": "t:names.heading",
+          "settings": {
+            "text": "<p>Doğadan ilham alan, cilde saygılı kozmetik bakım</p>",
+            "width": "fit-content",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h2",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "text_color": "{{ settings.color_palette.background }}",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "button_H9gpTf": {
+          "type": "button",
+          "name": "t:names.button",
+          "settings": {
+            "label": "Şimdi Keşfet",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false,
+            "style_class": "button-custom",
+            "custom_button_background": "rgba(0, 0, 0, 0)",
+            "custom_button_text": "{{ settings.color_palette.background }}",
+            "custom_button_border": "{{ settings.color_palette.background }}",
+            "width": "fit-content",
+            "custom_width": 100,
+            "width_mobile": "fit-content",
+            "custom_width_mobile": 100
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "text_YLPk4p",
+        "button_H9gpTf"
+      ],
+      "name": "t:names.hero",
       "settings": {
-        "height": "large",
-        "overlay_opacity": 20,
-        "autoplay": true,
-        "change_speed": 6
+        "media_type_1": "image",
+        "media_type_2": "image",
+        "link": "",
+        "open_in_new_tab": false,
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "space-between",
+        "vertical_alignment": "flex-end",
+        "align_baseline": true,
+        "horizontal_alignment_flex_direction_column": "center",
+        "vertical_alignment_flex_direction_column": "flex-end",
+        "gap": 24,
+        "section_width": "page-width",
+        "section_height": "medium",
+        "section_height_custom": 50,
+        "toggle_overlay": true,
+        "overlay_color": "#12121266",
+        "overlay_style": "solid",
+        "gradient_direction": "to bottom",
+        "blurred_reflection": false,
+        "reflection_opacity": 75,
+        "padding-block-start": 100,
+        "padding-block-end": 72
+      }
+    },
+    "features_icons": {
+      "type": "section",
+      "settings": {
+        "content_direction": "row",
+        "vertical_on_mobile": true,
+        "gap": 16,
+        "section_width": "page-width",
+        "padding-block-start": 48,
+        "padding-block-end": 48
       },
       "blocks": {
-        "slide-1": {
-          "type": "slide",
+        "group_1": {
+          "type": "group",
           "settings": {
-            "color_scheme": "scheme-1",
-            "text_position": "left",
-            "subheading": "Yeni Sezon",
-            "heading": "Cildinizin İhtiyacı Olan Bakım",
-            "text": "<p>%100 doğal içeriklerle üretilen Bayramov Cosmetics ürünlerini keşfedin.</p>",
-            "button_label": "Şimdi Keşfet",
-            "button_link": "shopify://collections/all",
-            "button_style": "primary"
-          }
+            "content_direction": "column",
+            "vertical_on_mobile": true,
+            "horizontal_alignment": "flex-start",
+            "vertical_alignment": "center",
+            "horizontal_alignment_flex_direction_column": "center",
+            "vertical_alignment_flex_direction_column": "center",
+            "gap": 16,
+            "height": "fit"
+          },
+          "blocks": {
+            "icon": {
+              "type": "icon",
+              "settings": {
+                "icon": "leaf",
+                "width": 32,
+                "link": ""
+              }
+            },
+            "group": {
+              "type": "group",
+              "settings": {
+                "gap": 4
+              },
+              "blocks": {
+                "heading": {
+                  "type": "text",
+                  "settings": {
+                    "text": "%100 Doğal İçerik",
+                    "type_preset": "h3",
+                    "font": "var(--font-body--family)",
+                    "font_size": "",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "center",
+                    "padding-block-start": 0,
+                    "padding-block-end": 0
+                  }
+                },
+                "text": {
+                  "type": "text",
+                  "settings": {
+                    "text": "Dermatolojik test edilmiş, cilt dostu formüller.",
+                    "type_preset": "rte",
+                    "font": "var(--font-body--family)",
+                    "font_size": "",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "center",
+                    "padding-block-start": 0,
+                    "padding-block-end": 0
+                  }
+                }
+              },
+              "block_order": [
+                "heading",
+                "text"
+              ]
+            }
+          },
+          "block_order": [
+            "icon",
+            "group"
+          ]
         },
-        "slide-2": {
-          "type": "slide",
+        "group_2": {
+          "type": "group",
           "settings": {
-            "color_scheme": "scheme-4",
-            "text_position": "center",
-            "subheading": "Sınırlı Süre",
-            "heading": "Cilt Bakım Setlerinde %20 İndirim",
-            "text": "<p>Doğal ve etkili formüllerle tanışın.</p>",
-            "button_label": "Fırsatları Gör",
-            "button_link": "shopify://collections/all",
-            "button_style": "secondary"
+            "content_direction": "column",
+            "vertical_on_mobile": true,
+            "horizontal_alignment": "flex-start",
+            "vertical_alignment": "center",
+            "horizontal_alignment_flex_direction_column": "center",
+            "vertical_alignment_flex_direction_column": "center",
+            "gap": 16,
+            "height": "fit"
+          },
+          "blocks": {
+            "icon": {
+              "type": "icon",
+              "settings": {
+                "icon": "truck",
+                "width": 32,
+                "link": ""
+              }
+            },
+            "group": {
+              "type": "group",
+              "settings": {
+                "gap": 4
+              },
+              "blocks": {
+                "heading": {
+                  "type": "text",
+                  "settings": {
+                    "text": "Ücretsiz Kargo",
+                    "type_preset": "h3",
+                    "font": "var(--font-body--family)",
+                    "font_size": "",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "center",
+                    "padding-block-start": 0,
+                    "padding-block-end": 0
+                  }
+                },
+                "text": {
+                  "type": "text",
+                  "settings": {
+                    "text": "500 TL üzeri siparişlerde kargo bizden.",
+                    "type_preset": "rte",
+                    "font": "var(--font-body--family)",
+                    "font_size": "",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "center",
+                    "padding-block-start": 0,
+                    "padding-block-end": 0
+                  }
+                }
+              },
+              "block_order": [
+                "heading",
+                "text"
+              ]
+            }
+          },
+          "block_order": [
+            "icon",
+            "group"
+          ]
+        },
+        "group_3": {
+          "type": "group",
+          "settings": {
+            "content_direction": "column",
+            "vertical_on_mobile": true,
+            "horizontal_alignment": "flex-start",
+            "vertical_alignment": "center",
+            "horizontal_alignment_flex_direction_column": "center",
+            "vertical_alignment_flex_direction_column": "center",
+            "gap": 16,
+            "height": "fit"
+          },
+          "blocks": {
+            "icon": {
+              "type": "icon",
+              "settings": {
+                "icon": "lock",
+                "width": 32,
+                "link": ""
+              }
+            },
+            "group": {
+              "type": "group",
+              "settings": {
+                "gap": 4
+              },
+              "blocks": {
+                "heading": {
+                  "type": "text",
+                  "settings": {
+                    "text": "Güvenli Ödeme",
+                    "type_preset": "h3",
+                    "font": "var(--font-body--family)",
+                    "font_size": "",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "center",
+                    "padding-block-start": 0,
+                    "padding-block-end": 0
+                  }
+                },
+                "text": {
+                  "type": "text",
+                  "settings": {
+                    "text": "256-bit SSL ile korumalı ödeme altyapısı.",
+                    "type_preset": "rte",
+                    "font": "var(--font-body--family)",
+                    "font_size": "",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "center",
+                    "padding-block-start": 0,
+                    "padding-block-end": 0
+                  }
+                }
+              },
+              "block_order": [
+                "heading",
+                "text"
+              ]
+            }
+          },
+          "block_order": [
+            "icon",
+            "group"
+          ]
+        }
+      },
+      "block_order": [
+        "group_1",
+        "group_2",
+        "group_3"
+      ]
+    },
+    "collection_list_1": {
+      "type": "collection-list",
+      "settings": {
+        "layout_type": "bento",
+        "bento_gap": 8,
+        "section_width": "page-width",
+        "carousel_on_mobile": false,
+        "padding-block-start": 24,
+        "padding-block-end": 24,
+        "collection_list": []
+      },
+      "blocks": {
+        "group_Lg9LkF": {
+          "type": "group",
+          "name": "t:names.header",
+          "settings": {
+            "content_direction": "column",
+            "vertical_on_mobile": true,
+            "horizontal_alignment": "flex-start",
+            "vertical_alignment": "center",
+            "horizontal_alignment_flex_direction_column": "flex-start",
+            "vertical_alignment_flex_direction_column": "center",
+            "gap": 16,
+            "width": "fill",
+            "custom_width": 100,
+            "width_mobile": "fill",
+            "custom_width_mobile": 100,
+            "height": "fit",
+            "custom_height": 100,
+            "background_media": "none",
+            "video_position": "cover",
+            "background_image_position": "cover",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "text_bc98Wh": {
+              "type": "text",
+              "name": "t:names.text",
+              "settings": {
+                "text": "<h2>Kategoriye Göre Alışveriş</h2>",
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "width": "fit-content",
+                "max_width": "normal",
+                "alignment": "left",
+                "padding-block-start": 0,
+                "padding-block-end": 16,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              }
+            }
+          },
+          "block_order": [
+            "text_bc98Wh"
+          ]
+        },
+        "static-collection-card": {
+          "type": "_collection-card",
+          "name": "t:names.collection_card",
+          "static": true,
+          "settings": {
+            "horizontal_alignment": "flex-start",
+            "vertical_alignment": "flex-end",
+            "placement": "on_image",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0
+          },
+          "blocks": {
+            "collection-card-image": {
+              "type": "_collection-card-image",
+              "name": "t:names.collection_card_image",
+              "static": true,
+              "settings": {
+                "image_ratio": "adapt"
+              }
+            },
+            "collection-title": {
+              "type": "collection-title",
+              "name": "t:names.collection_title",
+              "settings": {
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "width": "fit-content",
+                "max_width": "normal",
+                "alignment": "left",
+                "background": true,
+                "background_color": "#ffffff",
+                "padding-block-start": 4,
+                "padding-block-end": 4,
+                "padding-inline-start": 8,
+                "padding-inline-end": 8
+              }
+            }
+          },
+          "block_order": [
+            "collection-title"
+          ]
+        }
+      },
+      "block_order": [
+        "group_Lg9LkF"
+      ]
+    },
+    "product_list_fa6P9H": {
+      "type": "product-list",
+      "blocks": {
+        "static-header": {
+          "type": "_product-list-content",
+          "name": "t:names.header",
+          "static": true,
+          "settings": {
+            "content_direction": "row",
+            "vertical_on_mobile": false,
+            "horizontal_alignment": "space-between",
+            "vertical_alignment": "flex-end",
+            "align_baseline": true,
+            "horizontal_alignment_flex_direction_column": "flex-start",
+            "vertical_alignment_flex_direction_column": "center",
+            "gap": 12,
+            "width": "fill",
+            "custom_width": 100,
+            "width_mobile": "fill",
+            "custom_width_mobile": 100,
+            "height": "fit",
+            "custom_height": 100,
+            "background_media": "none",
+            "video_position": "cover",
+            "background_image_position": "cover",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "product_list_text_YFtzcL": {
+              "type": "_product-list-text",
+              "name": "t:names.collection_title",
+              "settings": {
+                "text": "<h3>{{ closest.collection.title }}</h3>",
+                "width": "fit-content",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "h4",
+                "font": "var(--font-body--family)",
+                "font_size": "",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_list_button_MWeP9V": {
+              "type": "_product-list-button",
+              "name": "t:names.product_list_button",
+              "settings": {
+                "label": "Tümünü Gör",
+                "open_in_new_tab": false,
+                "style_class": "button-unstyled",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "product_list_text_YFtzcL",
+            "product_list_button_MWeP9V"
+          ]
+        },
+        "static-product-card": {
+          "type": "_product-card",
+          "name": "t:names.product_card",
+          "static": true,
+          "settings": {
+            "product_card_gap": 4,
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "product_card_gallery_677WP3": {
+              "type": "_product-card-gallery",
+              "name": "t:names.product_card_media",
+              "settings": {
+                "image_ratio": "adapt",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_title_YXxMTj": {
+              "type": "product-title",
+              "name": "t:names.product_title",
+              "settings": {
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "paragraph",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 4,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "price_JQzVV4": {
+              "type": "price",
+              "name": "t:names.product_price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "type_preset": "h6",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "product_card_gallery_677WP3",
+            "product_title_YXxMTj",
+            "price_JQzVV4"
+          ]
+        }
+      },
+      "name": "t:names.featured_collection",
+      "settings": {
+        "collection": "all",
+        "layout_type": "grid",
+        "carousel_on_mobile": false,
+        "max_products": 8,
+        "columns": 4,
+        "mobile_columns": "2",
+        "mobile_card_size": "60cqw",
+        "columns_gap": 8,
+        "rows_gap": 24,
+        "icons_style": "arrow",
+        "icons_shape": "none",
+        "section_width": "page-width",
+        "horizontal_alignment": "flex-start",
+        "gap": 28,
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    },
+    "media_with_content_1": {
+      "type": "media-with-content",
+      "settings": {
+        "media_width": "medium",
+        "media_height": "60svh"
+      },
+      "blocks": {
+        "media": {
+          "type": "_media-without-appearance",
+          "static": true
+        },
+        "content": {
+          "type": "_content-without-appearance",
+          "static": true,
+          "settings": {
+            "horizontal_alignment_flex_direction_column": "flex-start",
+            "vertical_alignment_flex_direction_column": "space-between"
+          },
+          "blocks": {
+            "caption": {
+              "type": "text",
+              "name": "t:names.caption",
+              "settings": {
+                "text": "Markamız",
+                "type_preset": "h6"
+              }
+            },
+            "group": {
+              "type": "group",
+              "settings": {
+                "height": "fit"
+              },
+              "blocks": {
+                "heading": {
+                  "type": "text",
+                  "name": "t:names.heading",
+                  "settings": {
+                    "text": "Doğallık ve Etkiyi Buluşturuyoruz",
+                    "type_preset": "h3"
+                  }
+                },
+                "text": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Bayramov Cosmetics olarak cildinize saygı duyan formüllerle üretilen ürünlerimizi özenle hazırlıyoruz. Her damla, doğanın gücünü bilime taşıyor.</p>",
+                    "max_width": "narrow",
+                    "type_preset": "rte"
+                  }
+                }
+              },
+              "block_order": [
+                "heading",
+                "text"
+              ]
+            },
+            "button": {
+              "type": "button",
+              "settings": {
+                "label": "Hikayemiz",
+                "link": "shopify://pages/hakkimizda",
+                "style_class": "button-unstyled"
+              }
+            }
+          },
+          "block_order": [
+            "caption",
+            "group",
+            "button"
+          ]
+        }
+      }
+    },
+    "marquee_1": {
+      "type": "marquee",
+      "blocks": {
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "DOĞAL ✦ VEGAN ✦ KRUELTİ-FREE ✦ DERMATOLOJİK TEST EDİLMİŞ ✦",
+            "type_preset": "custom",
+            "font": "var(--font-body--family)",
+            "font_size": "var(--font-size--h2)",
+            "line_height": "tight",
+            "letter_spacing": "tight",
+            "case": "none",
+            "wrap": "nowrap",
+            "width": "fit-content"
           }
         }
       },
-      "block_order": ["slide-1", "slide-2"]
+      "block_order": [
+        "text"
+      ]
     },
-    "multicolumn": {
-      "type": "multicolumn",
-      "blocks": {
-        "item-1": { "type": "item", "settings": { "icon": "truck", "heading": "Ücretsiz Kargo", "text": "<p>500 TL üzeri siparişlerde</p>" } },
-        "item-2": { "type": "item", "settings": { "icon": "shield", "heading": "Güvenli Ödeme", "text": "<p>256-bit SSL koruması</p>" } },
-        "item-3": { "type": "item", "settings": { "icon": "leaf", "heading": "%100 Doğal İçerik", "text": "<p>Dermatolojik test edilmiştir</p>" } },
-        "item-4": { "type": "item", "settings": { "icon": "gift", "heading": "Kolay İade", "text": "<p>14 gün içinde ücretsiz iade</p>" } }
+    "pull_quote_1": {
+      "type": "section",
+      "settings": {
+        "horizontal_alignment_flex_direction_column": "center",
+        "gap": 16,
+        "padding-block-start": 64,
+        "padding-block-end": 64
       },
-      "block_order": ["item-1", "item-2", "item-3", "item-4"],
-      "settings": {
-        "heading": "",
-        "columns_desktop": "4",
-        "color_scheme": "scheme-2"
-      }
-    },
-    "collection-list": {
-      "type": "collection-list",
       "blocks": {
-        "col-1": { "type": "collection", "settings": { "title": "Cilt Bakımı" } },
-        "col-2": { "type": "collection", "settings": { "title": "Makyaj" } },
-        "col-3": { "type": "collection", "settings": { "title": "Saç Bakımı" } },
-        "col-4": { "type": "collection", "settings": { "title": "Parfüm" } },
-        "col-5": { "type": "collection", "settings": { "title": "Setler" } }
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>\"Cildim çok daha canlı ve nemli görünüyor. Bayramov ürünleri artık rutinimin vazgeçilmezi.\"</p>",
+            "type_preset": "h2",
+            "width": "100%",
+            "max_width": "narrow",
+            "alignment": "center"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "label": "Ürünleri Keşfet",
+            "link": "shopify://collections/all",
+            "style_class": "button-unstyled"
+          }
+        }
       },
-      "block_order": ["col-1", "col-2", "col-3", "col-4", "col-5"],
-      "settings": {
-        "heading": "Kategorilere Göre Alışveriş",
-        "heading_alignment": "center",
-        "columns_desktop": "5",
-        "color_scheme": "scheme-1"
-      }
+      "block_order": [
+        "text",
+        "button"
+      ]
     },
-    "featured-collection": {
-      "type": "featured-collection",
+    "featured_blog_posts_1": {
+      "type": "featured-blog-posts",
       "settings": {
-        "subheading": "Bayramov Cosmetics",
-        "heading": "Çok Satanlar",
-        "heading_alignment": "left",
-        "products_to_show": 8,
-        "columns_desktop": "4",
-        "show_view_all": true,
-        "color_scheme": "scheme-1"
-      }
-    },
-    "image-with-text": {
-      "type": "image-with-text",
-      "settings": {
-        "image_ratio": "portrait",
-        "layout": "image-left",
-        "subheading": "Markamız",
-        "heading": "Doğallık ve Etkiyi Buluşturuyoruz",
-        "text": "<p>Bayramov Cosmetics olarak, cildinize saygı duyan formüllerle üretilen ürünlerimizi özenle hazırlıyoruz. Her damla, doğanın gücünü bilime taşıyor.</p>",
-        "button_label": "Hikayemiz",
-        "button_link": "shopify://pages/hakkimizda",
-        "color_scheme": "scheme-2"
-      }
-    },
-    "countdown-banner": {
-      "type": "countdown-banner",
-      "settings": {
-        "subheading": "Kaçırılmayacak Fırsat",
-        "heading": "Yaz Kampanyasında %30'a Varan İndirim",
-        "end_date": "2026-08-31 23:59",
-        "button_label": "Kampanyayı İncele",
-        "button_link": "shopify://collections/all",
-        "color_scheme": "scheme-3"
-      }
-    },
-    "testimonials": {
-      "type": "testimonials",
+        "layout_type": "grid",
+        "carousel_on_mobile": false,
+        "columns": 3,
+        "mobile_columns": "2",
+        "columns_gap": 8,
+        "rows_gap": 8,
+        "gap": 12,
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      },
       "blocks": {
-        "t-1": { "type": "testimonial", "settings": { "rating": 5, "name": "Elif Y.", "text": "Cildim çok daha canlı ve nemli görünüyor. Kesinlikle tavsiye ederim!" } },
-        "t-2": { "type": "testimonial", "settings": { "rating": 5, "name": "Merve K.", "text": "Doğal içerikleri ve hızlı kargosu ile favorim oldu." } },
-        "t-3": { "type": "testimonial", "settings": { "rating": 5, "name": "Zeynep A.", "text": "Ambalajı ve kokusu harika, tekrar sipariş vereceğim." } }
-      },
-      "block_order": ["t-1", "t-2", "t-3"],
-      "settings": {
-        "subheading": "Müşterilerimiz Ne Diyor",
-        "heading": "Binlerce Mutlu Müşteri",
-        "color_scheme": "scheme-2"
+        "static-blog-title": {
+          "type": "_featured-blog-posts-title",
+          "name": "t:names.title",
+          "static": true,
+          "settings": {
+            "text": "<h3>{{ closest.blog.title }}</h3>",
+            "type_preset": "rte"
+          }
+        },
+        "static-blog-post-card": {
+          "type": "_featured-blog-posts-card",
+          "name": "t:names.blog_card",
+          "static": true,
+          "settings": {},
+          "blocks": {
+            "title": {
+              "type": "_heading",
+              "name": "t:names.title",
+              "static": true,
+              "settings": {
+                "text": "<h4>{{ closest.article.title }}</h4>",
+                "show_alignment": false
+              }
+            },
+            "blog-post-info-text": {
+              "type": "_blog-post-info-text",
+              "name": "t:names.details",
+              "static": true,
+              "settings": {
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "show_alignment": false
+              }
+            },
+            "blog-post-description": {
+              "type": "_blog-post-description",
+              "name": "t:names.excerpt",
+              "static": true,
+              "settings": {
+                "padding-block-start": 8,
+                "padding-block-end": 0
+              }
+            }
+          }
+        }
       }
     },
-    "brand-logos": {
-      "type": "brand-logos",
+    "email_signup_1": {
+      "type": "section",
+      "settings": {
+        "horizontal_alignment_flex_direction_column": "center",
+        "gap": 16,
+        "padding-block-start": 40,
+        "padding-block-end": 40
+      },
       "blocks": {
-        "b-1": { "type": "logo", "settings": { "name": "Vogue" } },
-        "b-2": { "type": "logo", "settings": { "name": "Elle" } },
-        "b-3": { "type": "logo", "settings": { "name": "Marie Claire" } },
-        "b-4": { "type": "logo", "settings": { "name": "Cosmopolitan" } },
-        "b-5": { "type": "logo", "settings": { "name": "Harper's Bazaar" } }
+        "text_1": {
+          "type": "text",
+          "name": "t:names.heading",
+          "settings": {
+            "text": "<h2>İlk Siparişinizde %10 İndirim Kazanın</h2>",
+            "width": "100%",
+            "alignment": "center"
+          }
+        },
+        "text_2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Yeni ürünler, kampanyalar ve bakım önerilerinden ilk siz haberdar olun.</p>",
+            "type_preset": "paragraph",
+            "width": "100%",
+            "alignment": "center"
+          }
+        },
+        "email_signup": {
+          "type": "email-signup",
+          "settings": {
+            "width": "custom",
+            "custom_width": 50,
+            "style_class": "button-unstyled",
+            "display_type": "arrow",
+            "label": "Abone Ol",
+            "integrated_button": true
+          }
+        }
       },
-      "block_order": ["b-1", "b-2", "b-3", "b-4", "b-5"],
-      "settings": {
-        "heading": "GÜVENİLEN MARKALAR TARAFINDAN TERCİH EDİLİYOR",
-        "color_scheme": "scheme-1"
-      }
-    },
-    "blog-posts": {
-      "type": "blog-posts",
-      "settings": {
-        "subheading": "Güzellik Rehberi",
-        "heading": "Blogumuzdan Son Yazılar",
-        "heading_alignment": "left",
-        "posts_to_show": 3,
-        "columns_desktop": "3",
-        "show_excerpt": true,
-        "color_scheme": "scheme-1"
-      }
-    },
-    "instagram-gallery": {
-      "type": "instagram-gallery",
-      "blocks": {
-        "ig-1": { "type": "image" },
-        "ig-2": { "type": "image" },
-        "ig-3": { "type": "image" },
-        "ig-4": { "type": "image" },
-        "ig-5": { "type": "image" },
-        "ig-6": { "type": "image" }
-      },
-      "block_order": ["ig-1", "ig-2", "ig-3", "ig-4", "ig-5", "ig-6"],
-      "settings": {
-        "heading": "Bizi Instagram'da Takip Edin",
-        "handle": "bayramovcosmetics",
-        "color_scheme": "scheme-1"
-      }
-    },
-    "newsletter": {
-      "type": "newsletter",
-      "settings": {
-        "subheading": "Bültenimize Katılın",
-        "heading": "İlk Siparişinizde %10 İndirim Kazanın",
-        "text": "<p>Yeni ürünler, kampanyalar ve bakım önerilerinden ilk siz haberdar olun.</p>",
-        "color_scheme": "scheme-3"
-      }
+      "block_order": [
+        "text_1",
+        "text_2",
+        "email_signup"
+      ]
     }
   },
   "order": [
-    "slideshow",
-    "multicolumn",
-    "collection-list",
-    "featured-collection",
-    "image-with-text",
-    "countdown-banner",
-    "testimonials",
-    "brand-logos",
-    "blog-posts",
-    "instagram-gallery",
-    "newsletter"
+    "hero_jVaWmY",
+    "features_icons",
+    "collection_list_1",
+    "product_list_fa6P9H",
+    "media_with_content_1",
+    "marquee_1",
+    "pull_quote_1",
+    "featured_blog_posts_1",
+    "email_signup_1"
   ]
 }

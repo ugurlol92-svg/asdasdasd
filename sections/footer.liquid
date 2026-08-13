@@ -1,149 +1,262 @@
-<footer class="footer color-{{ section.settings.color_scheme }}">
-  <div class="footer__main page-width">
-    <div class="footer__grid">
-      {%- for block in section.blocks -%}
-        <div class="footer__block footer__block--{{ block.type }}" {{ block.shopify_attributes }}>
-          {%- case block.type -%}
+{% liquid
+  if section.settings.background_color != blank
+    render 'contrast-override', background_color: section.settings.background_color, section_id: section.id
+  endif
+%}
 
-            {%- when 'brand' -%}
-              {%- if block.settings.logo != blank -%}
-                <img src="{{ block.settings.logo | image_url: width: 300 }}" alt="{{ shop.name }}" width="{{ block.settings.logo_width }}" style="max-width:{{ block.settings.logo_width }}px" loading="lazy">
-              {%- else -%}
-                <p class="footer__logo-text">{{ shop.name }}</p>
-              {%- endif -%}
-              {%- if block.settings.text != blank -%}
-                <div class="footer__text">{{ block.settings.text }}</div>
-              {%- endif -%}
-              {% render 'social-icons' %}
+<div
+  class="section-background{% if section.settings.background_color != blank %} color-custom-{{ section.id }}{% endif %}"
+></div>
+<div
+  class="section section--{{ section.settings.section_width }}{% if section.settings.background_color != blank %} color-custom-{{ section.id }}{% endif %}"
+>
+  {% liquid
+    assign total_blocks = section.blocks.size
 
-            {%- when 'link_list' -%}
-              {%- if block.settings.heading != blank -%}<h3 class="footer__heading">{{ block.settings.heading }}</h3>{%- endif -%}
-              <ul class="footer__link-list">
-                {%- for link in block.settings.menu.links -%}
-                  <li><a href="{{ link.url }}">{{ link.title }}</a></li>
-                {%- endfor -%}
-              </ul>
+    # Grid layout calculations
+    assign grid_columns = total_blocks | at_most: 4
 
-            {%- when 'text' -%}
-              {%- if block.settings.heading != blank -%}<h3 class="footer__heading">{{ block.settings.heading }}</h3>{%- endif -%}
-              <div class="footer__text">{{ block.settings.text }}</div>
+    # Calculate last row counts using modulo arithmetic
+    # last_row_count = (total_blocks - 1) % N + 1
+    assign last_row_count = total_blocks | minus: 1 | modulo: 4 | plus: 1
+    assign tablet_last_row_count = total_blocks | minus: 1 | modulo: 2 | plus: 1
 
-            {%- when 'contact' -%}
-              {%- if block.settings.heading != blank -%}<h3 class="footer__heading">{{ block.settings.heading }}</h3>{%- endif -%}
-              <ul class="footer__contact-list">
-                {%- if settings.contact_address != blank -%}
-                  <li>{% render 'icon', icon: 'location' %}<span>{{ settings.contact_address }}</span></li>
-                {%- endif -%}
-                {%- if settings.contact_phone != blank -%}
-                  <li>{% render 'icon', icon: 'phone' %}<a href="tel:{{ settings.contact_phone }}">{{ settings.contact_phone }}</a></li>
-                {%- endif -%}
-                {%- if settings.contact_email != blank -%}
-                  <li>{% render 'icon', icon: 'email' %}<a href="mailto:{{ settings.contact_email }}">{{ settings.contact_email }}</a></li>
-                {%- endif -%}
-              </ul>
+    # Check if there are orphaned elements (single item in last row)
+    assign has_isolated_grid_item_desktop = false
+    assign has_isolated_grid_item_tablet = false
 
-            {%- when 'newsletter' -%}
-              {%- if block.settings.heading != blank -%}<h3 class="footer__heading">{{ block.settings.heading }}</h3>{%- endif -%}
-              {%- if block.settings.text != blank -%}<p class="footer__text">{{ block.settings.text }}</p>{%- endif -%}
-              {% form 'customer', id: 'FooterNewsletterForm', class: 'footer__newsletter-form' %}
-                <input type="hidden" name="contact[tags]" value="newsletter">
-                <div class="footer__newsletter-row">
-                  <input type="email" name="contact[email]" placeholder="{{ 'newsletter.label' | t }}" required class="footer__newsletter-input">
-                  <button type="submit" class="button button--primary">{% render 'icon', icon: 'arrow-right' %}</button>
-                </div>
-                {%- if form.posted_successfully? -%}
-                  <p class="form__message form__message--success">{{ 'newsletter.success' | t }}</p>
-                {%- endif -%}
-              {% endform %}
-          {%- endcase -%}
-        </div>
-      {%- endfor -%}
-    </div>
+    if total_blocks > 4 and last_row_count == 1
+      assign has_isolated_grid_item_desktop = true
+    endif
+
+    if total_blocks == 5
+      assign has_isolated_grid_item_tablet = true
+    endif
+  %}
+  <div
+    class="
+      footer-content
+      spacing-style
+      {% if has_isolated_grid_item_desktop %}footer-content--isolated-grid-item-desktop{% endif %}
+      {% if has_isolated_grid_item_tablet %}footer-content--isolated-grid-item-tablet{% endif %}
+    "
+    style="
+      {%  render 'spacing-style', settings: section.settings %}
+      --footer-gap: {{ section.settings.gap }}px;
+      --grid-columns: {{ grid_columns }};
+      --last-row-count: {{ last_row_count }};
+      --tablet-last-row-count: {{ tablet_last_row_count }};
+    "
+  >
+    {% content_for 'blocks' %}
   </div>
+</div>
 
-  <div class="footer__bottom">
-    <div class="footer__bottom-inner page-width">
-      <p class="footer__copyright">&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. Tüm hakları saklıdır.</p>
-      {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
-        <ul class="footer__payment-icons">
-          {%- for type in shop.enabled_payment_types -%}
-            <li>{{ type | payment_type_svg_tag: class: 'footer__payment-icon' }}</li>
-          {%- endfor -%}
-        </ul>
-      {%- endif -%}
-    </div>
-  </div>
-</footer>
+{% stylesheet %}
+  .footer-content {
+    contain: content;
+    content-visibility: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--footer-gap);
+    align-items: start;
+  }
+
+  .footer-content .menu__heading__default {
+    font-weight: var(--font-heading--weight);
+  }
+
+  @media screen and (min-width: 750px) and (max-width: 989px) {
+    .footer-content {
+      grid-template-columns: repeat(min(var(--grid-columns), 3), 1fr);
+      grid-auto-flow: row;
+    }
+
+    .footer-content[style*='--grid-columns: 4'] {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .footer-content--isolated-grid-item-tablet > :last-child {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .footer-content {
+      grid-template-columns: repeat(var(--grid-columns), 1fr);
+    }
+
+    /* Single item centered */
+    .footer-content[style*='--grid-columns: 1'] {
+      justify-items: center;
+    }
+
+    .footer-content--isolated-grid-item-desktop > :last-child {
+      grid-column: 1 / -1;
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
-  "name": "Alt Bilgi",
-  "settings": [
-    {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "Renk şeması",
-      "default": "scheme-3"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_payment_icons",
-      "label": "Ödeme ikonlarını göster",
-      "default": true
-    }
-  ],
+  "name": "t:names.footer",
+  "class": "section-wrapper",
   "blocks": [
     {
-      "type": "brand",
-      "name": "Marka / Logo",
-      "limit": 1,
-      "settings": [
-        { "type": "image_picker", "id": "logo", "label": "Logo" },
-        { "type": "range", "id": "logo_width", "min": 60, "max": 260, "step": 10, "default": 140, "unit": "px", "label": "Logo genişliği" },
-        { "type": "richtext", "id": "text", "label": "Açıklama", "default": "<p>Doğadan ilham alan, cilt dostu kozmetik ürünleri.</p>" }
-      ]
+      "type": "_divider"
     },
     {
-      "type": "link_list",
-      "name": "Bağlantı Listesi",
-      "settings": [
-        { "type": "text", "id": "heading", "label": "Başlık", "default": "Kurumsal" },
-        { "type": "link_list", "id": "menu", "label": "Menü", "default": "footer" }
-      ]
+      "type": "@app"
     },
     {
-      "type": "contact",
-      "name": "İletişim Bilgisi",
-      "limit": 1,
-      "settings": [
-        { "type": "text", "id": "heading", "label": "Başlık", "default": "İletişim" }
-      ]
+      "type": "button"
     },
     {
-      "type": "newsletter",
-      "name": "Bülten Kaydı",
-      "limit": 1,
-      "settings": [
-        { "type": "text", "id": "heading", "label": "Başlık", "default": "Fırsatlardan haberdar olun" },
-        { "type": "text", "id": "text", "label": "Açıklama", "default": "Yeni ürünler ve kampanyalar için e-posta listemize katılın." }
-      ]
+      "type": "follow-on-shop"
     },
     {
-      "type": "text",
-      "name": "Metin Bloğu",
-      "settings": [
-        { "type": "text", "id": "heading", "label": "Başlık", "default": "Yardım" },
-        { "type": "richtext", "id": "text", "label": "Metin", "default": "<p>Hafta içi 09:00 - 18:00 arası hizmetinizdeyiz.</p>" }
-      ]
+      "type": "group"
+    },
+    {
+      "type": "icon"
+    },
+    {
+      "type": "image"
+    },
+    {
+      "type": "menu"
+    },
+    {
+      "type": "payment-icons"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "logo"
+    },
+    {
+      "type": "jumbo-text"
+    },
+    {
+      "type": "social-links"
+    },
+    {
+      "type": "email-signup"
     }
   ],
-  "default": {
-    "blocks": [
-      { "type": "brand" },
-      { "type": "link_list", "settings": { "heading": "Kurumsal" } },
-      { "type": "contact" },
-      { "type": "newsletter" }
-    ]
-  }
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "settings": [
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "t:settings.background_color",
+      "default": "{{ settings.color_palette.foreground }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.footer",
+      "category": "t:categories.footer",
+      "settings": {
+        "gap": 20,
+        "padding-block-start": 36,
+        "padding-block-end": 36
+      },
+      "blocks": {
+        "newsletter-group": {
+          "type": "group",
+          "settings": {
+            "content_direction": "column",
+            "vertical_on_mobile": true,
+            "horizontal_alignment": "flex-start",
+            "vertical_alignment": "center",
+            "gap": 6,
+            "width": "fill"
+          },
+          "blocks": {
+            "newsletter-heading": {
+              "type": "text",
+              "settings": {
+                "text": "t:html_defaults.join_our_email_list",
+                "width": "100%",
+                "alignment": "left",
+                "type_preset": "h3"
+              }
+            },
+            "newsletter-text": {
+              "type": "text",
+              "settings": {
+                "text": "t:html_defaults.get_exclusive_deals_and_early_access_to_new_products",
+                "width": "100%",
+                "alignment": "left",
+                "type_preset": "rte"
+              }
+            }
+          },
+          "block_order": ["newsletter-heading", "newsletter-text"]
+        },
+        "newsletter-form": {
+          "type": "email-signup",
+          "settings": {
+            "width": "fill"
+          }
+        }
+      },
+      "block_order": ["newsletter-group", "newsletter-form"]
+    }
+  ]
 }
 {% endschema %}
