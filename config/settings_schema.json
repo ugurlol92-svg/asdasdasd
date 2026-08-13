@@ -93,65 +93,7 @@
           "on_primary_button": "button_label",
           "secondary_button": "secondary_button_background",
           "on_secondary_button": "secondary_button_label"
-        },
-        "default": [
-          {
-            "id": "scheme-1",
-            "settings": {
-              "background": "#FFFFFF",
-              "text": "#2B2420",
-              "text_muted": "#7A6F68",
-              "border": "#E7DFDA",
-              "button": "#2B2420",
-              "button_label": "#FFFFFF",
-              "secondary_button_background": "#FFFFFF",
-              "secondary_button_label": "#2B2420",
-              "link": "#9E7568"
-            }
-          },
-          {
-            "id": "scheme-2",
-            "settings": {
-              "background": "#F7F1EE",
-              "text": "#2B2420",
-              "text_muted": "#7A6F68",
-              "border": "#E7DFDA",
-              "button": "#2B2420",
-              "button_label": "#FFFFFF",
-              "secondary_button_background": "#FFFFFF",
-              "secondary_button_label": "#2B2420",
-              "link": "#9E7568"
-            }
-          },
-          {
-            "id": "scheme-3",
-            "settings": {
-              "background": "#2B2420",
-              "text": "#FFFFFF",
-              "text_muted": "#C9BEB6",
-              "border": "#4A3F38",
-              "button": "#C79A8C",
-              "button_label": "#2B2420",
-              "secondary_button_background": "transparent",
-              "secondary_button_label": "#FFFFFF",
-              "link": "#C79A8C"
-            }
-          },
-          {
-            "id": "scheme-4",
-            "settings": {
-              "background": "#C79A8C",
-              "text": "#2B2420",
-              "text_muted": "#4A3730",
-              "border": "#B5836F",
-              "button": "#2B2420",
-              "button_label": "#FFFFFF",
-              "secondary_button_background": "#FFFFFF",
-              "secondary_button_label": "#2B2420",
-              "link": "#2B2420"
-            }
-          }
-        ]
+        }
       }
     ]
   },
