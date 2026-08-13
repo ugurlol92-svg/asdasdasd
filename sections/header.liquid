@@ -1,0 +1,146 @@
+<header class="header color-{{ section.settings.color_scheme }} header--{{ section.settings.layout }}" data-header {% if section.settings.sticky %}data-sticky-header{% endif %}>
+  <div class="header__inner page-width">
+    <button type="button" class="header__menu-toggle" data-menu-toggle aria-expanded="false" aria-controls="MobileMenu" aria-label="{{ 'accessibility.menu' | t }}">
+      {% render 'icon', icon: 'menu' %}
+    </button>
+
+    <div class="header__logo">
+      <a href="{{ routes.root_url }}" class="header__logo-link">
+        {%- if section.settings.logo != blank -%}
+          <img
+            src="{{ section.settings.logo | image_url: width: 400 }}"
+            alt="{{ shop.name }}"
+            width="{{ section.settings.logo_width }}"
+            style="max-width: {{ section.settings.logo_width }}px;"
+            class="header__logo-image"
+            loading="eager"
+          >
+        {%- else -%}
+          <span class="header__logo-text">{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+    </div>
+
+    <nav class="header__nav" aria-label="{{ 'accessibility.menu' | t }}">
+      <ul class="header__menu">
+        {%- for link in section.settings.menu.links -%}
+          <li class="header__menu-item {% if link.links != blank %}has-dropdown{% endif %}">
+            <a href="{{ link.url }}" class="header__menu-link" {% if link.current %}aria-current="page"{% endif %}>
+              {{ link.title }}
+              {%- if link.links != blank %}{% render 'icon', icon: 'chevron-down', class: 'header__menu-caret' %}{% endif -%}
+            </a>
+            {%- if link.links != blank -%}
+              <div class="header__dropdown">
+                <ul class="header__dropdown-list">
+                  {%- for childlink in link.links -%}
+                    <li><a href="{{ childlink.url }}" class="header__dropdown-link">{{ childlink.title }}</a></li>
+                  {%- endfor -%}
+                </ul>
+              </div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    <div class="header__icons">
+      <button type="button" class="header__icon-button" data-search-drawer-open aria-label="{{ 'accessibility.search' | t }}">
+        {% render 'icon', icon: 'search' %}
+      </button>
+      <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="header__icon-button" aria-label="{{ 'accessibility.account' | t }}">
+        {% render 'icon', icon: 'account' %}
+      </a>
+      <a href="{{ routes.cart_url }}" class="header__icon-button header__cart-button" data-cart-icon-bubble aria-label="{{ 'accessibility.cart' | t }}" {% if settings.cart_type == 'drawer' %}data-cart-drawer-open{% endif %}>
+        {% render 'icon', icon: 'cart' %}
+        <span class="header__cart-count {% if cart.item_count == 0 %}hidden{% endif %}" data-cart-count>{{ cart.item_count }}</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="MobileMenu" data-mobile-menu aria-hidden="true">
+  <div class="mobile-menu__overlay" data-menu-toggle></div>
+  <div class="mobile-menu__panel color-{{ section.settings.color_scheme }}">
+    <div class="mobile-menu__header">
+      <span class="mobile-menu__title">{{ 'accessibility.menu' | t }}</span>
+      <button type="button" class="mobile-menu__close" data-menu-toggle aria-label="{{ 'general.close' | t }}">
+        {% render 'icon', icon: 'close' %}
+      </button>
+    </div>
+    <ul class="mobile-menu__list">
+      {%- for link in section.settings.menu.links -%}
+        <li class="mobile-menu__item">
+          {%- if link.links != blank -%}
+            <details>
+              <summary class="mobile-menu__link">
+                {{ link.title }}
+                {% render 'icon', icon: 'chevron-down' %}
+              </summary>
+              <ul class="mobile-menu__sublist">
+                {%- for childlink in link.links -%}
+                  <li><a href="{{ childlink.url }}" class="mobile-menu__sublink">{{ childlink.title }}</a></li>
+                {%- endfor -%}
+              </ul>
+            </details>
+          {%- else -%}
+            <a href="{{ link.url }}" class="mobile-menu__link">{{ link.title }}</a>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+    <div class="mobile-menu__footer">
+      {% render 'social-icons' %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Üst Menü",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 60,
+      "max": 260,
+      "step": 10,
+      "unit": "px",
+      "label": "Logo genişliği",
+      "default": 140
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menü",
+      "default": "main-menu"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Düzen",
+      "options": [
+        { "value": "logo-left", "label": "Logo solda" },
+        { "value": "logo-center", "label": "Logo ortada" }
+      ],
+      "default": "logo-center"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Sayfa kaydırılırken sabit kalsın",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Renk şeması",
+      "default": "scheme-1"
+    }
+  ]
+}
+{% endschema %}

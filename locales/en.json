@@ -1,0 +1,176 @@
+{
+  "general": {
+    "meta": {
+      "tags": "Tags: {{ tags }}",
+      "page": "Page {{ page }}"
+    },
+    "search": {
+      "placeholder": "What are you looking for?",
+      "submit": "Search",
+      "no_results_html": "No results found for \"{{ terms }}\"",
+      "results_for_html": "{{ count }} results for \"{{ terms }}\"",
+      "title": "Search"
+    },
+    "social": {
+      "follow_on": "Follow us on {{ social_media }}"
+    },
+    "continue_shopping": "Continue shopping",
+    "close": "Close",
+    "back_to_top": "Back to top",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "label": "Pagination"
+    },
+    "share": {
+      "copy_to_clipboard": "Copy link",
+      "share_url": "Link",
+      "success_message": "Link copied to clipboard"
+    }
+  },
+  "newsletter": {
+    "label": "Email",
+    "success": "Thanks for subscribing!",
+    "button_label": "Subscribe"
+  },
+  "accessibility": {
+    "skip_to_content": "Skip to content",
+    "close": "Close",
+    "menu": "Menu",
+    "cart": "Cart",
+    "account": "Account",
+    "search": "Search",
+    "unit_price_separator": "/",
+    "vendor": "Vendor:",
+    "star_reviews_info": "{{ rating_value }} out of 5 stars"
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Add to Cart",
+      "sold_out": "Sold Out",
+      "unavailable": "Unavailable",
+      "on_sale": "Sale",
+      "quantity": {
+        "label": "Quantity",
+        "increase": "Increase",
+        "decrease": "Decrease"
+      },
+      "choose_options": "Choose Options",
+      "quick_add": "Quick Add",
+      "view_details": "View Details",
+      "sku": "SKU",
+      "vendor": "Vendor",
+      "price": {
+        "from_price_html": "From {{ price }}"
+      },
+      "in_stock": "In Stock",
+      "low_stock": "Low Stock",
+      "description": "Description",
+      "shipping_and_returns": "Shipping & Returns",
+      "how_to_use": "How to Use",
+      "ingredients": "Ingredients",
+      "share": "Share",
+      "media": {
+        "open_media": "Open media in gallery view",
+        "play_video": "Play video"
+      },
+      "xproduct": {
+        "recommended": "You may also like"
+      }
+    }
+  },
+  "cart": {
+    "general": {
+      "title": "Your Cart",
+      "empty": "Your cart is currently empty.",
+      "continue_shopping": "Continue shopping",
+      "subtotal": "Subtotal",
+      "checkout": "Checkout",
+      "view_cart": "View Cart",
+      "remove": "Remove",
+      "note": "Add order note",
+      "update": "Update",
+      "shipping_at_checkout": "Shipping & taxes calculated at checkout.",
+      "free_shipping_reached": "You've earned free shipping! 🎉",
+      "free_shipping_progress_html": "<strong>{{ amount }}</strong> away from free shipping",
+      "headings": {
+        "product": "Product",
+        "price": "Price",
+        "quantity": "Quantity",
+        "total": "Total"
+      }
+    }
+  },
+  "blogs": {
+    "article": {
+      "read_more": "Read More",
+      "comments": {
+        "one": "{{ count }} comment",
+        "other": "{{ count }} comments"
+      },
+      "comment_form_title": "Leave a comment",
+      "name": "Name",
+      "email": "Email",
+      "message": "Message",
+      "post": "Post Comment",
+      "moderated": "Comments are moderated before publishing.",
+      "success": "Your comment was posted successfully!",
+      "back_to_blog": "Back to blog",
+      "tags": "Tags"
+    }
+  },
+  "templates": {
+    "404": {
+      "title": "Page Not Found",
+      "subtext": "The page you requested does not exist.",
+      "back_home": "Back to Home"
+    },
+    "search": {
+      "title": "Search Results"
+    },
+    "contact": {
+      "form": {
+        "name": "Full Name",
+        "email": "Email",
+        "phone": "Phone (optional)",
+        "message": "Message",
+        "send": "Send",
+        "post_success": "Thanks for reaching out. We'll get back to you soon."
+      }
+    }
+  },
+  "customer": {
+    "account": {
+      "title": "My Account",
+      "details": "Account Details",
+      "view_addresses": "View Addresses",
+      "return": "Return to Account Details"
+    },
+    "orders": {
+      "title": "Order History",
+      "order_number": "Order",
+      "date": "Date",
+      "payment_status": "Payment Status",
+      "fulfillment_status": "Fulfillment Status",
+      "total": "Total",
+      "none": "You haven't placed any orders yet."
+    },
+    "login_page": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Password",
+      "sign_in": "Sign In",
+      "forgot_password": "Forgot your password?",
+      "create_account": "Create Account",
+      "guest_continue": "Continue as guest"
+    },
+    "register": {
+      "title": "Create Account",
+      "first_name": "First Name",
+      "last_name": "Last Name",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Create"
+    }
+  }
+}

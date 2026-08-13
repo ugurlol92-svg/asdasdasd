@@ -1,0 +1,103 @@
+{%- comment -%}
+  Renders a product card.
+  Accepts: card_product (product object), image_ratio, show_vendor, show_second_image, show_quick_add, color_scheme
+{%- endcomment -%}
+{%- liquid
+  assign image_ratio = image_ratio | default: settings.card_image_ratio
+  assign show_vendor = show_vendor | default: settings.card_show_vendor
+  assign show_second_image = show_second_image | default: settings.card_show_second_image
+  assign show_quick_add = show_quick_add | default: settings.card_quick_add
+  assign show_badges = settings.card_show_badges
+  assign color_scheme = color_scheme | default: settings.card_color_scheme
+  assign card_product = card_product | default: product
+-%}
+
+<div class="product-card color-{{ color_scheme }}" data-product-card>
+  {%- if card_product == blank -%}
+    <div class="product-card__media product-card__media--placeholder ratio-{{ image_ratio }}">
+      {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    </div>
+    <div class="product-card__info">
+      <h3 class="product-card__title">Ürün Başlığı</h3>
+      <span class="price"><span class="price__regular">{{ 1999 | money }}</span></span>
+    </div>
+  {%- else -%}
+    <a href="{{ card_product.url }}" class="product-card__media-link" aria-label="{{ card_product.title | escape }}">
+      <div class="product-card__media ratio-{{ image_ratio }}">
+        {%- if card_product.featured_media -%}
+          <img
+            class="product-card__image product-card__image--primary"
+            src="{{ card_product.featured_media | image_url: width: 600 }}"
+            srcset="{{ card_product.featured_media | image_url: width: 300 }} 300w, {{ card_product.featured_media | image_url: width: 600 }} 600w, {{ card_product.featured_media | image_url: width: 900 }} 900w"
+            sizes="(min-width: 990px) 25vw, 50vw"
+            alt="{{ card_product.featured_media.alt | escape }}"
+            width="{{ card_product.featured_media.width }}"
+            height="{{ card_product.featured_media.height }}"
+            loading="lazy"
+          >
+          {%- if show_second_image and card_product.media[1] -%}
+            <img
+              class="product-card__image product-card__image--secondary"
+              src="{{ card_product.media[1] | image_url: width: 600 }}"
+              srcset="{{ card_product.media[1] | image_url: width: 300 }} 300w, {{ card_product.media[1] | image_url: width: 600 }} 600w"
+              sizes="(min-width: 990px) 25vw, 50vw"
+              alt=""
+              loading="lazy"
+            >
+          {%- endif -%}
+        {%- else -%}
+          {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        {%- endif -%}
+
+        {%- if show_badges -%}
+          <div class="product-card__badges">
+            {%- if card_product.available == false -%}
+              <span class="badge badge--sold-out">{{ 'products.product.sold_out' | t }}</span>
+            {%- elsif card_product.compare_at_price > card_product.price -%}
+              {%- assign discount = card_product.compare_at_price | minus: card_product.price | times: 100.0 | divided_by: card_product.compare_at_price | round -%}
+              <span class="badge badge--sale">-%{{ discount }}</span>
+            {%- endif -%}
+            {%- if card_product.tags contains 'Yeni' or card_product.tags contains 'new' -%}
+              <span class="badge badge--new">Yeni</span>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- if show_quick_add and card_product.selected_or_first_available_variant -%}
+          <quick-add-card class="product-card__quick-add" data-product-id="{{ card_product.id }}" data-product-handle="{{ card_product.handle }}" data-variant-id="{{ card_product.selected_or_first_available_variant.id }}" data-has-only-default-variant="{{ card_product.has_only_default_variant }}">
+            <button type="button" class="button button--secondary button--full quick-add-card__button" {% if card_product.available == false %}disabled{% endif %}>
+              {%- if card_product.available == false -%}
+                {{ 'products.product.sold_out' | t }}
+              {%- elsif card_product.has_only_default_variant -%}
+                {{ 'products.product.quick_add' | t }}
+              {%- else -%}
+                {{ 'products.product.choose_options' | t }}
+              {%- endif -%}
+            </button>
+          </quick-add-card>
+        {%- endif -%}
+      </div>
+    </a>
+
+    <div class="product-card__info">
+      {%- if show_vendor -%}
+        <p class="product-card__vendor">{{ card_product.vendor }}</p>
+      {%- endif -%}
+      <h3 class="product-card__title">
+        <a href="{{ card_product.url }}">{{ card_product.title }}</a>
+      </h3>
+
+      {%- if card_product.metafields.reviews.rating.value -%}
+        <div class="product-card__rating" aria-hidden="true">
+          {%- assign rating = card_product.metafields.reviews.rating.value.rating -%}
+          {%- for i in (1..5) -%}
+            {% render 'icon', icon: 'star', class: 'rating-star' | append: ' ' | append: rating | ceil %}
+          {%- endfor -%}
+          <span class="visually-hidden">{{ 'accessibility.star_reviews_info' | t: rating_value: rating }}</span>
+        </div>
+      {%- endif -%}
+
+      {% render 'price', product: card_product, show_badge: false %}
+    </div>
+  {%- endif -%}
+</div>

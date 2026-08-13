@@ -1,0 +1,27 @@
+<section class="error-404 color-{{ section.settings.color_scheme }} section-padding" data-section-id="{{ section.id }}">
+  <div class="page-width page-width--narrow error-404__inner">
+    <p class="error-404__code">404</p>
+    <h1 class="error-404__title">{{ 'templates.404.title' | t }}</h1>
+    <p class="error-404__text">{{ 'templates.404.subtext' | t }}</p>
+    <a href="{{ routes.root_url }}" class="button button--primary">{{ 'templates.404.back_home' | t }}</a>
+
+    <div class="error-404__search">
+      <form action="{{ routes.search_url }}" method="get" role="search">
+        <input type="search" name="q" placeholder="{{ 'general.search.placeholder' | t }}" value="{{ search.terms | escape }}">
+        <input type="hidden" name="type" value="product">
+        <button type="submit">{% render 'icon', icon: 'search' %}</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "404 Sayfası",
+  "tag": "section",
+  "class": "section-404",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Renk şeması", "default": "scheme-2" }
+  ]
+}
+{% endschema %}

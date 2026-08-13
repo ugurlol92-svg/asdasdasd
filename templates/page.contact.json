@@ -1,0 +1,16 @@
+{
+  "sections": {
+    "main": {
+      "type": "contact-form",
+      "settings": {
+        "subheading": "Bize Ulaşın",
+        "heading": "İletişim",
+        "heading_alignment": "center",
+        "text": "<p>Sorularınız için formu doldurun, size en kısa sürede dönüş yapalım.</p>",
+        "show_map": true,
+        "color_scheme": "scheme-1"
+      }
+    }
+  },
+  "order": ["main"]
+}

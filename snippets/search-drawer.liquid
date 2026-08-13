@@ -1,0 +1,24 @@
+<search-drawer id="SearchDrawer" class="search-drawer color-scheme-1" data-search-drawer aria-hidden="true">
+  <div class="search-drawer__overlay" data-search-drawer-close></div>
+  <div class="search-drawer__panel" role="dialog" aria-modal="true" aria-label="{{ 'general.search.title' | t }}">
+    <div class="search-drawer__header">
+      <form action="{{ routes.search_url }}" method="get" role="search" class="search-drawer__form" data-predictive-search>
+        {% render 'icon', icon: 'search', class: 'search-drawer__icon' %}
+        <input
+          type="search"
+          name="q"
+          class="search-drawer__input"
+          placeholder="{{ 'general.search.placeholder' | t }}"
+          autocomplete="off"
+          value="{{ search.terms | escape }}"
+          data-predictive-search-input
+        >
+        <input type="hidden" name="type" value="product">
+        <button type="button" class="search-drawer__close" data-search-drawer-close aria-label="{{ 'general.close' | t }}">
+          {% render 'icon', icon: 'close' %}
+        </button>
+      </form>
+    </div>
+    <div class="search-drawer__results" id="PredictiveSearchResults" data-predictive-search-results></div>
+  </div>
+</search-drawer>

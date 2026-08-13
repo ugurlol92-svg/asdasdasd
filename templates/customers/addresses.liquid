@@ -1,0 +1,44 @@
+<div class="customer-section color-scheme-1 section-padding">
+  <div class="page-width page-width--narrow">
+    <a href="{{ routes.account_url }}" class="account-order__back">{% render 'icon', icon: 'chevron-left' %} {{ 'customer.account.return' | t }}</a>
+    <h1>{{ 'customer.account.view_addresses' | t }}</h1>
+
+    <ul class="address-list">
+      {%- for address in customer.addresses -%}
+        <li class="address-list__item">
+          {{ address | format_address }}
+          {%- if address == customer.default_address -%}<span class="address-list__default">Varsayılan</span>{%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+
+    {%- form 'customer_address', customer.new_address -%}
+      <h2>Yeni Adres Ekle</h2>
+      <div class="customer-form__row">
+        <label for="AddressFirstName">{{ 'customer.register.first_name' | t }}</label>
+        <input type="text" name="address[first_name]" id="AddressFirstName">
+      </div>
+      <div class="customer-form__row">
+        <label for="AddressLastName">{{ 'customer.register.last_name' | t }}</label>
+        <input type="text" name="address[last_name]" id="AddressLastName">
+      </div>
+      <div class="customer-form__row">
+        <label for="AddressAddress1">Adres</label>
+        <input type="text" name="address[address1]" id="AddressAddress1">
+      </div>
+      <div class="customer-form__row">
+        <label for="AddressCity">Şehir</label>
+        <input type="text" name="address[city]" id="AddressCity">
+      </div>
+      <div class="customer-form__row">
+        <label for="AddressZip">Posta Kodu</label>
+        <input type="text" name="address[zip]" id="AddressZip">
+      </div>
+      <div class="customer-form__row">
+        <label for="AddressPhone">Telefon</label>
+        <input type="tel" name="address[phone]" id="AddressPhone">
+      </div>
+      <button type="submit" class="button button--primary">Kaydet</button>
+    {%- endform -%}
+  </div>
+</div>

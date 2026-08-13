@@ -1,0 +1,102 @@
+<section class="collection-grid-section color-{{ section.settings.color_scheme }} section-padding" data-section-id="{{ section.id }}">
+  <div class="page-width">
+    <div class="collection-toolbar">
+      <button type="button" class="collection-toolbar__filter-toggle" data-filters-toggle>
+        {% render 'icon', icon: 'filter' %} Filtrele
+      </button>
+      <p class="collection-toolbar__count">{{ collection.products_count }} ürün</p>
+      <form class="collection-toolbar__sort" data-sort-form>
+        <label for="SortBy" class="visually-hidden">Sırala</label>
+        <select name="sort_by" id="SortBy" data-sort-select>
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}" {% if option.value == collection.sort_by %}selected{% endif %}>{{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </div>
+
+    <div class="collection-layout">
+      <aside class="collection-filters" data-filters-panel id="CollectionFilters">
+        <div class="collection-filters__header">
+          <span>Filtrele</span>
+          <button type="button" class="collection-filters__close" data-filters-toggle aria-label="{{ 'general.close' | t }}">{% render 'icon', icon: 'close' %}</button>
+        </div>
+        {% form 'collection_filtering', class: 'collection-filters__form', data-filters-form: true %}
+          {%- for filter in collection.filters -%}
+            <details class="collection-filters__group" open>
+              <summary class="collection-filters__group-title">
+                {{ filter.label }}
+                {% render 'icon', icon: 'chevron-down' %}
+              </summary>
+              <div class="collection-filters__group-body">
+                {%- case filter.type -%}
+                  {%- when 'price_range' -%}
+                    <div class="collection-filters__price-range">
+                      <label>
+                        <span class="visually-hidden">Min</span>
+                        <input type="number" name="{{ filter.min_value.param_name }}" placeholder="{{ filter.range_min | money_without_currency }}" value="{{ filter.min_value.value }}" min="0">
+                      </label>
+                      <span>—</span>
+                      <label>
+                        <span class="visually-hidden">Max</span>
+                        <input type="number" name="{{ filter.max_value.param_name }}" placeholder="{{ filter.range_max | money_without_currency }}" value="{{ filter.max_value.value }}" min="0">
+                      </label>
+                    </div>
+                  {%- when 'boolean' -%}
+                    {%- for value in filter.values -%}
+                      <label class="collection-filters__checkbox">
+                        <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %} data-filter-input>
+                        {{ value.label }}
+                      </label>
+                    {%- endfor -%}
+                  {%- else -%}
+                    {%- for value in filter.values -%}
+                      <label class="collection-filters__checkbox">
+                        <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %} {% if value.count == 0 and value.active == false %}disabled{% endif %} data-filter-input>
+                        {{ value.label }} <span class="collection-filters__count">({{ value.count }})</span>
+                      </label>
+                    {%- endfor -%}
+                {%- endcase -%}
+              </div>
+            </details>
+          {%- endfor -%}
+          <button type="submit" class="button button--primary button--full collection-filters__apply">Filtreleri Uygula</button>
+          <a href="{{ collection.url }}" class="collection-filters__clear">Filtreleri Temizle</a>
+        {% endform %}
+      </aside>
+
+      <div class="collection-grid-wrapper">
+        {%- paginate collection.products by section.settings.products_per_page -%}
+          {%- if collection.products.size > 0 -%}
+            <div class="product-grid product-grid--{{ section.settings.columns_desktop }}-col" id="ProductGrid">
+              {%- for product in collection.products -%}
+                {% render 'product-card', card_product: product %}
+              {%- endfor -%}
+            </div>
+          {%- else -%}
+            <div class="collection-empty">
+              <p>Bu koleksiyonda ürün bulunamadı.</p>
+              <a href="{{ routes.all_products_collection_url }}" class="button button--secondary">Tüm Ürünlere Göz At</a>
+            </div>
+          {%- endif -%}
+          {% render 'pagination', paginate: paginate %}
+        {%- endpaginate -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Ürün Izgarası",
+  "tag": "section",
+  "class": "section-collection-grid",
+  "settings": [
+    { "type": "range", "id": "products_per_page", "min": 8, "max": 48, "step": 4, "label": "Sayfa başına ürün", "default": 24 },
+    { "type": "select", "id": "columns_desktop", "label": "Sütun sayısı", "options": [
+      { "value": "3", "label": "3" }, { "value": "4", "label": "4" }, { "value": "5", "label": "5" }
+    ], "default": "4" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Renk şeması", "default": "scheme-1" }
+  ]
+}
+{% endschema %}

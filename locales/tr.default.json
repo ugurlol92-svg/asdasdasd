@@ -1,0 +1,176 @@
+{
+  "general": {
+    "meta": {
+      "tags": "Etiketler: {{ tags }}",
+      "page": "Sayfa {{ page }}"
+    },
+    "search": {
+      "placeholder": "Ne aramıştınız?",
+      "submit": "Ara",
+      "no_results_html": "\"{{ terms }}\" için sonuç bulunamadı.",
+      "results_for_html": "\"{{ terms }}\" için {{ count }} sonuç",
+      "title": "Arama"
+    },
+    "social": {
+      "follow_on": "{{ social_media }} üzerinden takip edin"
+    },
+    "continue_shopping": "Alışverişe devam et",
+    "close": "Kapat",
+    "back_to_top": "Yukarı çık",
+    "pagination": {
+      "previous": "Önceki",
+      "next": "Sonraki",
+      "label": "Sayfalama"
+    },
+    "share": {
+      "copy_to_clipboard": "Bağlantıyı kopyala",
+      "share_url": "Bağlantı",
+      "success_message": "Bağlantı panoya kopyalandı"
+    }
+  },
+  "newsletter": {
+    "label": "E-posta",
+    "success": "Aboneliğiniz için teşekkürler!",
+    "button_label": "Abone Ol"
+  },
+  "accessibility": {
+    "skip_to_content": "İçeriğe geç",
+    "close": "Kapat",
+    "menu": "Menü",
+    "cart": "Sepet",
+    "account": "Hesabım",
+    "search": "Ara",
+    "unit_price_separator": "/",
+    "vendor": "Marka:",
+    "star_reviews_info": "5 üzerinden {{ rating_value }} puan"
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Sepete Ekle",
+      "sold_out": "Tükendi",
+      "unavailable": "Mevcut Değil",
+      "on_sale": "İndirim",
+      "quantity": {
+        "label": "Adet",
+        "increase": "Artır",
+        "decrease": "Azalt"
+      },
+      "choose_options": "Seçenekleri Gör",
+      "quick_add": "Hızlı Ekle",
+      "view_details": "Ürünü İncele",
+      "sku": "SKU",
+      "vendor": "Marka",
+      "price": {
+        "from_price_html": "{{ price }}'dan başlayan fiyatlarla"
+      },
+      "in_stock": "Stokta",
+      "low_stock": "Son ürünler",
+      "description": "Ürün Açıklaması",
+      "shipping_and_returns": "Kargo ve İade",
+      "how_to_use": "Kullanım Şekli",
+      "ingredients": "İçindekiler",
+      "share": "Paylaş",
+      "media": {
+        "open_media": "Medyayı galeri görünümünde aç",
+        "play_video": "Videoyu oynat"
+      },
+      "xproduct": {
+        "recommended": "Bunları da beğenebilirsiniz"
+      }
+    }
+  },
+  "cart": {
+    "general": {
+      "title": "Sepetiniz",
+      "empty": "Sepetiniz şu anda boş.",
+      "continue_shopping": "Alışverişe devam et",
+      "subtotal": "Ara Toplam",
+      "checkout": "Ödemeye Geç",
+      "view_cart": "Sepeti Görüntüle",
+      "remove": "Kaldır",
+      "note": "Sipariş notu ekle",
+      "update": "Güncelle",
+      "shipping_at_checkout": "Kargo ve vergiler ödeme sayfasında hesaplanır.",
+      "free_shipping_reached": "Tebrikler! Ücretsiz kargo kazandınız 🎉",
+      "free_shipping_progress_html": "Ücretsiz kargoya <strong>{{ amount }}</strong> kaldı",
+      "headings": {
+        "product": "Ürün",
+        "price": "Fiyat",
+        "quantity": "Adet",
+        "total": "Toplam"
+      }
+    }
+  },
+  "blogs": {
+    "article": {
+      "read_more": "Devamını Oku",
+      "comments": {
+        "one": "{{ count }} yorum",
+        "other": "{{ count }} yorum"
+      },
+      "comment_form_title": "Yorum Yap",
+      "name": "İsim",
+      "email": "E-posta",
+      "message": "Yorumunuz",
+      "post": "Yorumu Gönder",
+      "moderated": "Yorumlar yayınlanmadan önce onaylanır.",
+      "success": "Yorumunuz alınmıştır, teşekkürler!",
+      "back_to_blog": "Bloga dön",
+      "tags": "Etiketler"
+    }
+  },
+  "templates": {
+    "404": {
+      "title": "Sayfa Bulunamadı",
+      "subtext": "Aradığınız sayfa mevcut değil ya da kaldırılmış olabilir.",
+      "back_home": "Anasayfaya Dön"
+    },
+    "search": {
+      "title": "Arama Sonuçları"
+    },
+    "contact": {
+      "form": {
+        "name": "Ad Soyad",
+        "email": "E-posta",
+        "phone": "Telefon (opsiyonel)",
+        "message": "Mesajınız",
+        "send": "Gönder",
+        "post_success": "Mesajınız için teşekkür ederiz. En kısa sürede dönüş yapacağız."
+      }
+    }
+  },
+  "customer": {
+    "account": {
+      "title": "Hesabım",
+      "details": "Hesap Detayları",
+      "view_addresses": "Adresleri Görüntüle",
+      "return": "Hesap detaylarına dön"
+    },
+    "orders": {
+      "title": "Sipariş Geçmişi",
+      "order_number": "Sipariş",
+      "date": "Tarih",
+      "payment_status": "Ödeme Durumu",
+      "fulfillment_status": "Kargo Durumu",
+      "total": "Toplam",
+      "none": "Henüz siparişiniz yok."
+    },
+    "login_page": {
+      "title": "Giriş Yap",
+      "email": "E-posta",
+      "password": "Şifre",
+      "sign_in": "Giriş Yap",
+      "forgot_password": "Şifremi unuttum",
+      "create_account": "Hesap Oluştur",
+      "guest_continue": "Misafir olarak devam et"
+    },
+    "register": {
+      "title": "Hesap Oluştur",
+      "first_name": "Ad",
+      "last_name": "Soyad",
+      "email": "E-posta",
+      "password": "Şifre",
+      "submit": "Hesap Oluştur"
+    }
+  }
+}

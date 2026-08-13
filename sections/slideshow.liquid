@@ -1,0 +1,137 @@
+<section class="slideshow-section" data-section-id="{{ section.id }}">
+  <slide-show class="slideshow slideshow--{{ section.settings.height }}" data-slideshow data-autoplay="{{ section.settings.autoplay }}" data-speed="{{ section.settings.change_speed | times: 1000 }}">
+    <div class="slideshow__slides">
+      {%- for block in section.blocks -%}
+        <div class="slideshow__slide color-{{ block.settings.color_scheme }} {% if forloop.index0 != 0 %}hidden{% endif %}" data-slide {{ block.shopify_attributes }}>
+          <div class="slideshow__media">
+            {%- if block.settings.image != blank -%}
+              <img
+                src="{{ block.settings.image | image_url: width: 2000 }}"
+                srcset="{{ block.settings.image | image_url: width: 800 }} 800w, {{ block.settings.image | image_url: width: 1400 }} 1400w, {{ block.settings.image | image_url: width: 2000 }} 2000w"
+                sizes="100vw"
+                alt="{{ block.settings.image.alt | escape }}"
+                width="{{ block.settings.image.width }}"
+                height="{{ block.settings.image.height }}"
+                loading="{% if forloop.index0 == 0 %}eager{% else %}lazy{% endif %}"
+                class="slideshow__image"
+              >
+            {%- else -%}
+              {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg slideshow__image' }}
+            {%- endif -%}
+            <div class="slideshow__overlay" style="opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }}"></div>
+          </div>
+          <div class="slideshow__content slideshow__content--{{ block.settings.text_position }}">
+            <div class="slideshow__content-inner">
+              {%- if block.settings.subheading != blank -%}
+                <p class="slideshow__subheading animate-in">{{ block.settings.subheading }}</p>
+              {%- endif -%}
+              {%- if block.settings.heading != blank -%}
+                <h2 class="slideshow__heading animate-in">{{ block.settings.heading }}</h2>
+              {%- endif -%}
+              {%- if block.settings.text != blank -%}
+                <div class="slideshow__text animate-in">{{ block.settings.text }}</div>
+              {%- endif -%}
+              {%- if block.settings.button_label != blank -%}
+                <div class="slideshow__buttons animate-in">
+                  <a href="{{ block.settings.button_link | default: '#' }}" class="button {% if block.settings.button_style == 'secondary' %}button--secondary{% else %}button--primary{% endif %}">
+                    {{ block.settings.button_label }}
+                  </a>
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+
+    {%- if section.blocks.size > 1 -%}
+      <button type="button" class="slideshow__arrow slideshow__arrow--prev" data-slide-prev aria-label="{{ 'general.pagination.previous' | t }}">{% render 'icon', icon: 'chevron-left' %}</button>
+      <button type="button" class="slideshow__arrow slideshow__arrow--next" data-slide-next aria-label="{{ 'general.pagination.next' | t }}">{% render 'icon', icon: 'chevron-right' %}</button>
+      <div class="slideshow__dots" data-slide-dots>
+        {%- for block in section.blocks -%}
+          <button type="button" class="slideshow__dot {% if forloop.index0 == 0 %}is-active{% endif %}" data-slide-dot data-index="{{ forloop.index0 }}" aria-label="{{ 'general.pagination.label' | t }} {{ forloop.index }}"></button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </slide-show>
+</section>
+
+{% schema %}
+{
+  "name": "Slayt Gösterisi",
+  "tag": "section",
+  "class": "section-slideshow",
+  "settings": [
+    {
+      "type": "select",
+      "id": "height",
+      "label": "Yükseklik",
+      "options": [
+        { "value": "small", "label": "Küçük" },
+        { "value": "medium", "label": "Orta" },
+        { "value": "large", "label": "Büyük" }
+      ],
+      "default": "large"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Görsel üstü karartma",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Otomatik oynat",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "change_speed",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "sn",
+      "label": "Geçiş süresi",
+      "default": 6
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slayt",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Görsel" },
+        { "type": "color_scheme", "id": "color_scheme", "label": "Renk şeması", "default": "scheme-1" },
+        { "type": "select", "id": "text_position", "label": "Metin konumu", "options": [
+          { "value": "left", "label": "Sol" },
+          { "value": "center", "label": "Orta" },
+          { "value": "right", "label": "Sağ" }
+        ], "default": "left" },
+        { "type": "text", "id": "subheading", "label": "Üst başlık", "default": "Yeni Koleksiyon" },
+        { "type": "text", "id": "heading", "label": "Başlık", "default": "Cildinizin İhtiyacı Olan Bakım" },
+        { "type": "richtext", "id": "text", "label": "Açıklama", "default": "<p>%100 doğal içeriklerle üretilen kozmetik ürünlerini keşfedin.</p>" },
+        { "type": "text", "id": "button_label", "label": "Buton yazısı", "default": "Şimdi Keşfet" },
+        { "type": "url", "id": "button_link", "label": "Buton bağlantısı" },
+        { "type": "select", "id": "button_style", "label": "Buton stili", "options": [
+          { "value": "primary", "label": "Birincil" },
+          { "value": "secondary", "label": "İkincil" }
+        ], "default": "primary" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Slayt Gösterisi",
+      "blocks": [
+        { "type": "slide" },
+        { "type": "slide", "settings": { "subheading": "Sınırlı Süre", "heading": "Cilt Bakım Setlerinde %20 İndirim", "color_scheme": "scheme-2" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

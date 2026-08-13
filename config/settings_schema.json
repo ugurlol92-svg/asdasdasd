@@ -1,0 +1,407 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Bayramov",
+    "theme_version": "1.0.0",
+    "theme_author": "Bayramov Cosmetics",
+    "theme_documentation_url": "https://github.com/",
+    "theme_support_url": "https://github.com/"
+  },
+  {
+    "name": "Renkler",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Marka Renkleri"
+      },
+      {
+        "type": "color",
+        "id": "color_primary",
+        "label": "Ana renk (vurgu)",
+        "default": "#C79A8C"
+      },
+      {
+        "type": "color",
+        "id": "color_primary_dark",
+        "label": "Ana renk (koyu ton)",
+        "default": "#9E7568"
+      },
+      {
+        "type": "color_scheme_group",
+        "id": "color_schemes",
+        "definition": [
+          {
+            "type": "color",
+            "id": "background",
+            "label": "Arka plan",
+            "default": "#FFFFFF"
+          },
+          {
+            "type": "color",
+            "id": "background_gradient",
+            "label": "Arka plan gradyanı",
+            "default": ""
+          },
+          {
+            "type": "color",
+            "id": "text",
+            "label": "Metin",
+            "default": "#2B2420"
+          },
+          {
+            "type": "color",
+            "id": "text_muted",
+            "label": "İkincil metin",
+            "default": "#7A6F68"
+          },
+          {
+            "type": "color",
+            "id": "border",
+            "label": "Kenarlık",
+            "default": "#E7DFDA"
+          },
+          {
+            "type": "color",
+            "id": "button",
+            "label": "Buton arka planı",
+            "default": "#2B2420"
+          },
+          {
+            "type": "color",
+            "id": "button_label",
+            "label": "Buton yazısı",
+            "default": "#FFFFFF"
+          },
+          {
+            "type": "color",
+            "id": "secondary_button_background",
+            "label": "İkincil buton arka planı",
+            "default": "#FFFFFF"
+          },
+          {
+            "type": "color",
+            "id": "secondary_button_label",
+            "label": "İkincil buton yazısı",
+            "default": "#2B2420"
+          },
+          {
+            "type": "color",
+            "id": "link",
+            "label": "Bağlantı",
+            "default": "#9E7568"
+          }
+        ],
+        "role": {
+          "text": "text",
+          "background": {
+            "solid": "background",
+            "gradient": "background_gradient"
+          },
+          "links": "link",
+          "icons": "text",
+          "primary_button": "button",
+          "on_primary_button": "button_label",
+          "secondary_button": "secondary_button_background",
+          "on_secondary_button": "secondary_button_label"
+        },
+        "default": [
+          {
+            "id": "scheme-1",
+            "settings": {
+              "background": "#FFFFFF",
+              "text": "#2B2420",
+              "text_muted": "#7A6F68",
+              "border": "#E7DFDA",
+              "button": "#2B2420",
+              "button_label": "#FFFFFF",
+              "secondary_button_background": "#FFFFFF",
+              "secondary_button_label": "#2B2420",
+              "link": "#9E7568"
+            }
+          },
+          {
+            "id": "scheme-2",
+            "settings": {
+              "background": "#F7F1EE",
+              "text": "#2B2420",
+              "text_muted": "#7A6F68",
+              "border": "#E7DFDA",
+              "button": "#2B2420",
+              "button_label": "#FFFFFF",
+              "secondary_button_background": "#FFFFFF",
+              "secondary_button_label": "#2B2420",
+              "link": "#9E7568"
+            }
+          },
+          {
+            "id": "scheme-3",
+            "settings": {
+              "background": "#2B2420",
+              "text": "#FFFFFF",
+              "text_muted": "#C9BEB6",
+              "border": "#4A3F38",
+              "button": "#C79A8C",
+              "button_label": "#2B2420",
+              "secondary_button_background": "transparent",
+              "secondary_button_label": "#FFFFFF",
+              "link": "#C79A8C"
+            }
+          },
+          {
+            "id": "scheme-4",
+            "settings": {
+              "background": "#C79A8C",
+              "text": "#2B2420",
+              "text_muted": "#4A3730",
+              "border": "#B5836F",
+              "button": "#2B2420",
+              "button_label": "#FFFFFF",
+              "secondary_button_background": "#FFFFFF",
+              "secondary_button_label": "#2B2420",
+              "link": "#2B2420"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Tipografi",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Başlıklar"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_heading_font",
+        "label": "Başlık fontu",
+        "default": "playfair_display_n4"
+      },
+      {
+        "type": "range",
+        "id": "heading_scale",
+        "min": 100,
+        "max": 150,
+        "step": 5,
+        "unit": "%",
+        "label": "Başlık boyut ölçeği",
+        "default": 100
+      },
+      {
+        "type": "header",
+        "content": "Gövde metni"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_body_font",
+        "label": "Gövde fontu",
+        "default": "jost_n4"
+      },
+      {
+        "type": "range",
+        "id": "body_scale",
+        "min": 90,
+        "max": 130,
+        "step": 5,
+        "unit": "%",
+        "label": "Gövde boyut ölçeği",
+        "default": 100
+      }
+    ]
+  },
+  {
+    "name": "Düzen",
+    "settings": [
+      {
+        "type": "range",
+        "id": "page_width",
+        "min": 1000,
+        "max": 1600,
+        "step": 20,
+        "unit": "px",
+        "label": "Sayfa genişliği",
+        "default": 1400
+      },
+      {
+        "type": "range",
+        "id": "spacing_sections",
+        "min": 0,
+        "max": 120,
+        "step": 4,
+        "unit": "px",
+        "label": "Bölümler arası boşluk",
+        "default": 60
+      },
+      {
+        "type": "range",
+        "id": "grid_horizontal_spacing",
+        "min": 4,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "label": "Izgara yatay boşluk",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "grid_vertical_spacing",
+        "min": 4,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "label": "Izgara dikey boşluk",
+        "default": 16
+      }
+    ]
+  },
+  {
+    "name": "Butonlar ve köşeler",
+    "settings": [
+      {
+        "type": "range",
+        "id": "button_radius",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "label": "Buton köşe yuvarlaklığı",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "card_radius",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "label": "Kart köşe yuvarlaklığı",
+        "default": 8
+      },
+      {
+        "type": "select",
+        "id": "buttons_border_thickness",
+        "label": "İkincil buton kenarlık kalınlığı",
+        "options": [
+          { "value": "1", "label": "İnce" },
+          { "value": "2", "label": "Orta" },
+          { "value": "3", "label": "Kalın" }
+        ],
+        "default": "1"
+      }
+    ]
+  },
+  {
+    "name": "Ürün kartı",
+    "settings": [
+      {
+        "type": "select",
+        "id": "card_image_ratio",
+        "label": "Görsel oranı",
+        "options": [
+          { "value": "portrait", "label": "Dikey (4:5)" },
+          { "value": "square", "label": "Kare (1:1)" },
+          { "value": "adapt", "label": "Görsele uyarla" }
+        ],
+        "default": "portrait"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_vendor",
+        "label": "Marka adını göster",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_second_image",
+        "label": "İmleç ile ikinci görseli göster",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_badges",
+        "label": "İndirim / Tükendi rozetlerini göster",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "card_quick_add",
+        "label": "Hızlı sepete ekle butonunu göster",
+        "default": true
+      },
+      {
+        "type": "color_scheme",
+        "id": "card_color_scheme",
+        "label": "Kart renk şeması",
+        "default": "scheme-1"
+      }
+    ]
+  },
+  {
+    "name": "Sepet",
+    "settings": [
+      {
+        "type": "select",
+        "id": "cart_type",
+        "label": "Sepet tipi",
+        "options": [
+          { "value": "drawer", "label": "Açılır panel" },
+          { "value": "page", "label": "Sepet sayfası" }
+        ],
+        "default": "drawer"
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_show_note",
+        "label": "Sipariş notu alanını göster",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_free_shipping",
+        "label": "Ücretsiz kargo barını göster",
+        "default": true
+      },
+      {
+        "type": "number",
+        "id": "cart_free_shipping_threshold",
+        "label": "Ücretsiz kargo eşiği",
+        "default": 500
+      }
+    ]
+  },
+  {
+    "name": "Favicon",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon görseli"
+      }
+    ]
+  },
+  {
+    "name": "Sosyal medya",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Hesaplar"
+      },
+      { "type": "text", "id": "social_instagram", "label": "Instagram", "default": "https://instagram.com/" },
+      { "type": "text", "id": "social_facebook", "label": "Facebook", "default": "https://facebook.com/" },
+      { "type": "text", "id": "social_tiktok", "label": "TikTok", "default": "https://tiktok.com/" },
+      { "type": "text", "id": "social_youtube", "label": "YouTube", "default": "" },
+      { "type": "text", "id": "social_pinterest", "label": "Pinterest", "default": "" },
+      { "type": "text", "id": "social_twitter", "label": "X / Twitter", "default": "" }
+    ]
+  },
+  {
+    "name": "İletişim bilgileri",
+    "settings": [
+      { "type": "text", "id": "contact_phone", "label": "Telefon", "default": "+90 500 000 00 00" },
+      { "type": "text", "id": "contact_email", "label": "E-posta", "default": "info@bayramov.com" },
+      { "type": "textarea", "id": "contact_address", "label": "Adres", "default": "Bayramov Kozmetik, İstanbul, Türkiye" },
+      { "type": "text", "id": "contact_hours", "label": "Çalışma saatleri", "default": "Hafta içi 09:00 - 18:00" }
+    ]
+  }
+]

@@ -1,0 +1,122 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}" dir="{{ settings.text_direction | default: 'ltr' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="{{ settings.color_schemes.scheme-1.settings.background }}">
+  <link rel="canonical" href="{{ canonical_url }}">
+  {% if settings.favicon %}
+    <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+  {% endif %}
+
+  {%- if page_description -%}
+    <meta name="description" content="{{ page_description | escape }}">
+  {%- endif -%}
+
+  <title>
+    {{ page_title }}
+    {%- if current_tags %} &ndash; {{ 'general.meta.tags' | t: tags: current_tags | join: ', ' }}{% endif -%}
+    {%- if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif -%}
+    {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+  </title>
+
+  {{ content_for_header }}
+
+  <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+
+  {%- style -%}
+    {{ settings.type_heading_font | font_face: font_display: 'swap' }}
+    {{ settings.type_body_font | font_face: font_display: 'swap' }}
+
+    :root {
+      --font-heading-family: {{ settings.type_heading_font.family }}, serif;
+      --font-heading-style: {{ settings.type_heading_font.style }};
+      --font-heading-weight: {{ settings.type_heading_font.weight }};
+      --font-body-family: {{ settings.type_body_font.family }}, sans-serif;
+      --font-body-style: {{ settings.type_body_font.style }};
+      --font-body-weight: {{ settings.type_body_font.weight }};
+      --heading-scale: {{ settings.heading_scale | default: 100 | divided_by: 100.0 }};
+      --body-scale: {{ settings.body_scale | default: 100 | divided_by: 100.0 }};
+      --page-width: {{ settings.page_width | default: 1400 }}px;
+      --spacing-sections: {{ settings.spacing_sections | default: 60 }}px;
+      --grid-h-spacing: {{ settings.grid_horizontal_spacing | default: 16 }}px;
+      --grid-v-spacing: {{ settings.grid_vertical_spacing | default: 16 }}px;
+      --button-radius: {{ settings.button_radius | default: 0 }}px;
+      --card-radius: {{ settings.card_radius | default: 8 }}px;
+      --button-border-width: {{ settings.buttons_border_thickness | default: 1 }}px;
+      --color-primary: {{ settings.color_primary.red }}, {{ settings.color_primary.green }}, {{ settings.color_primary.blue }};
+      --color-primary-dark: {{ settings.color_primary_dark.red }}, {{ settings.color_primary_dark.green }}, {{ settings.color_primary_dark.blue }};
+    }
+
+    {%- for scheme in settings.color_schemes -%}
+      {%- assign scheme_settings = scheme.settings -%}
+      .color-{{ scheme.id }} {
+        --color-background: {{ scheme_settings.background.red }}, {{ scheme_settings.background.green }}, {{ scheme_settings.background.blue }};
+        --color-text: {{ scheme_settings.text.red }}, {{ scheme_settings.text.green }}, {{ scheme_settings.text.blue }};
+        --color-text-muted: {{ scheme_settings.text_muted.red }}, {{ scheme_settings.text_muted.green }}, {{ scheme_settings.text_muted.blue }};
+        --color-border: {{ scheme_settings.border.red }}, {{ scheme_settings.border.green }}, {{ scheme_settings.border.blue }};
+        --color-button: {{ scheme_settings.button.red }}, {{ scheme_settings.button.green }}, {{ scheme_settings.button.blue }};
+        --color-button-label: {{ scheme_settings.button_label.red }}, {{ scheme_settings.button_label.green }}, {{ scheme_settings.button_label.blue }};
+        --color-secondary-button: {{ scheme_settings.secondary_button_background.red }}, {{ scheme_settings.secondary_button_background.green }}, {{ scheme_settings.secondary_button_background.blue }};
+        --color-secondary-button-label: {{ scheme_settings.secondary_button_label.red }}, {{ scheme_settings.secondary_button_label.green }}, {{ scheme_settings.secondary_button_label.blue }};
+        --color-link: {{ scheme_settings.link.red }}, {{ scheme_settings.link.green }}, {{ scheme_settings.link.blue }};
+        background-color: rgb(var(--color-background));
+        color: rgb(var(--color-text));
+      }
+    {%- endfor -%}
+  {%- endstyle -%}
+
+  <link rel="stylesheet" href="{{ 'theme.css' | asset_url }}">
+
+  <script>
+    window.Bayramov = {
+      routes: {
+        cart_url: {{ routes.cart_url | json }},
+        cart_add_url: {{ routes.cart_add_url | json }},
+        cart_change_url: {{ routes.cart_change_url | json }},
+        cart_update_url: {{ routes.cart_update_url | json }},
+        root_url: {{ routes.root_url | json }}
+      },
+      cartType: {{ settings.cart_type | json }},
+      moneyFormat: {{ shop.money_format | json }},
+      strings: {
+        noResults: {{ 'general.search.no_results_html' | t: terms: '' | strip_html | json }},
+        addToCart: {{ 'products.product.add_to_cart' | t | json }},
+        soldOut: {{ 'products.product.sold_out' | t | json }}
+      }
+    };
+  </script>
+  <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+  {%- if template.name == 'product' -%}
+    <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+  {%- endif -%}
+  <script src="{{ 'cart.js' | asset_url }}" defer="defer"></script>
+
+  {% comment %} theme-check-disable UnknownFilter {% endcomment %}
+</head>
+
+<body class="template-{{ template.name | handleize }}">
+  <a class="skip-to-content-link visually-hidden" href="#MainContent">{{ 'accessibility.skip_to_content' | t }}</a>
+
+  {% section 'announcement-bar' %}
+  {% section 'header' %}
+
+  <main id="MainContent" class="content-for-layout" role="main">
+    {{ content_for_layout }}
+  </main>
+
+  {% section 'footer' %}
+
+  {% section 'cart-drawer' %}
+  {% render 'search-drawer' %}
+
+  <div id="quick-add-modal" class="quick-add-modal" hidden>
+    <div class="quick-add-modal__overlay" data-quick-add-close></div>
+    <div class="quick-add-modal__content" id="QuickAddModalContent"></div>
+  </div>
+
+  <ul hidden>
+    <li id="a11y-refresh-page-message">{{ 'general.share.success_message' | t }}</li>
+  </ul>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<section class="brand-logos color-{{ section.settings.color_scheme }} section-padding" data-section-id="{{ section.id }}">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <p class="brand-logos__heading">{{ section.settings.heading }}</p>
+    {%- endif -%}
+    <div class="brand-logos__track" data-marquee>
+      <div class="brand-logos__group">
+        {%- for block in section.blocks -%}
+          <div class="brand-logos__item" {{ block.shopify_attributes }}>
+            {%- if block.settings.image != blank -%}
+              <img src="{{ block.settings.image | image_url: width: 300 }}" alt="{{ block.settings.name | escape }}" loading="lazy">
+            {%- else -%}
+              <span>{{ block.settings.name }}</span>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+      <div class="brand-logos__group" aria-hidden="true">
+        {%- for block in section.blocks -%}
+          <div class="brand-logos__item">
+            {%- if block.settings.image != blank -%}
+              <img src="{{ block.settings.image | image_url: width: 300 }}" alt="" loading="lazy">
+            {%- else -%}
+              <span>{{ block.settings.name }}</span>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Marka Şeridi",
+  "tag": "section",
+  "class": "section-brand-logos",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Başlık", "default": "GÜVENİLEN MARKALAR TARAFINDAN TERCİH EDİLİYOR" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Renk şeması", "default": "scheme-2" }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Logo görseli" },
+        { "type": "text", "id": "name", "label": "İsim (görsel yoksa)", "default": "Marka" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marka Şeridi",
+      "blocks": [
+        { "type": "logo" }, { "type": "logo" }, { "type": "logo" }, { "type": "logo" }, { "type": "logo" }
+      ]
+    }
+  ]
+}
+{% endschema %}

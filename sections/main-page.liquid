@@ -1,0 +1,20 @@
+<section class="page-section color-{{ section.settings.color_scheme }} section-padding" data-section-id="{{ section.id }}">
+  <div class="page-width page-width--narrow">
+    {% render 'breadcrumbs' %}
+    <h1 class="page-section__title">{{ page.title }}</h1>
+    <div class="page-section__content rte">
+      {{ page.content }}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Sayfa",
+  "tag": "section",
+  "class": "section-main-page",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Renk şeması", "default": "scheme-1" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,59 @@
+<div class="customer-section color-scheme-1 section-padding">
+  <div class="page-width page-width--narrow customer-form">
+    <h1 class="customer-form__title">{{ 'customer.login_page.title' | t }}</h1>
+
+    {%- form 'customer_login' -%}
+      {%- if form.errors -%}
+        <div class="form__message form__message--error">
+          {{ form.errors | default_errors }}
+        </div>
+      {%- endif -%}
+
+      <div class="customer-form__row">
+        <label for="CustomerEmail">{{ 'customer.login_page.email' | t }}</label>
+        <input type="email" name="customer[email]" id="CustomerEmail" autocomplete="email" autofocus required>
+      </div>
+
+      {%- if form.password_needed -%}
+        <div class="customer-form__row">
+          <label for="CustomerPassword">{{ 'customer.login_page.password' | t }}</label>
+          <input type="password" name="customer[password]" id="CustomerPassword" autocomplete="current-password" required>
+        </div>
+        <p class="customer-form__hint">
+          <a href="#" data-show-recover>{{ 'customer.login_page.forgot_password' | t }}</a>
+        </p>
+      {%- endif -%}
+
+      <button type="submit" class="button button--primary button--full">{{ 'customer.login_page.sign_in' | t }}</button>
+    {%- endform -%}
+
+    <div class="customer-form__recover" id="RecoverPasswordForm" hidden>
+      {%- form 'recover_customer_password' -%}
+        {%- if form.posted_successfully? -%}
+          <p class="form__message form__message--success">Şifre sıfırlama bağlantısı e-postanıza gönderildi.</p>
+        {%- endif -%}
+        <div class="customer-form__row">
+          <label for="RecoverEmail">{{ 'customer.login_page.email' | t }}</label>
+          <input type="email" name="email" id="RecoverEmail" required>
+        </div>
+        <button type="submit" class="button button--secondary">Sıfırlama Bağlantısı Gönder</button>
+      {%- endform -%}
+    </div>
+
+    <p class="customer-form__hint">
+      {{ 'customer.login_page.create_account' | t }}? <a href="{{ routes.account_register_url }}">{{ 'customer.register.submit' | t }}</a>
+    </p>
+
+    {%- if shop.checkout.guest_login -%}
+      {%- form 'guest_login' -%}
+        <button type="submit" class="button button--secondary button--full">{{ 'customer.login_page.guest_continue' | t }}</button>
+      {%- endform -%}
+    {%- endif -%}
+  </div>
+</div>
+<script>
+  document.querySelector('[data-show-recover]')?.addEventListener('click', function(e){
+    e.preventDefault();
+    document.getElementById('RecoverPasswordForm').hidden = false;
+  });
+</script>

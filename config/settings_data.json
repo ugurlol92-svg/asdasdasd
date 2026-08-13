@@ -1,0 +1,94 @@
+{
+  "current": {
+    "color_primary": "#C79A8C",
+    "color_primary_dark": "#9E7568",
+    "color_schemes": {
+      "scheme-1": {
+        "settings": {
+          "background": "#FFFFFF",
+          "text": "#2B2420",
+          "text_muted": "#7A6F68",
+          "border": "#E7DFDA",
+          "button": "#2B2420",
+          "button_label": "#FFFFFF",
+          "secondary_button_background": "#FFFFFF",
+          "secondary_button_label": "#2B2420",
+          "link": "#9E7568"
+        }
+      },
+      "scheme-2": {
+        "settings": {
+          "background": "#F7F1EE",
+          "text": "#2B2420",
+          "text_muted": "#7A6F68",
+          "border": "#E7DFDA",
+          "button": "#2B2420",
+          "button_label": "#FFFFFF",
+          "secondary_button_background": "#FFFFFF",
+          "secondary_button_label": "#2B2420",
+          "link": "#9E7568"
+        }
+      },
+      "scheme-3": {
+        "settings": {
+          "background": "#2B2420",
+          "text": "#FFFFFF",
+          "text_muted": "#C9BEB6",
+          "border": "#4A3F38",
+          "button": "#C79A8C",
+          "button_label": "#2B2420",
+          "secondary_button_background": "transparent",
+          "secondary_button_label": "#FFFFFF",
+          "link": "#C79A8C"
+        }
+      },
+      "scheme-4": {
+        "settings": {
+          "background": "#C79A8C",
+          "text": "#2B2420",
+          "text_muted": "#4A3730",
+          "border": "#B5836F",
+          "button": "#2B2420",
+          "button_label": "#FFFFFF",
+          "secondary_button_background": "#FFFFFF",
+          "secondary_button_label": "#2B2420",
+          "link": "#2B2420"
+        }
+      }
+    },
+    "type_heading_font": "playfair_display_n4",
+    "heading_scale": 100,
+    "type_body_font": "jost_n4",
+    "body_scale": 100,
+    "page_width": 1400,
+    "spacing_sections": 60,
+    "grid_horizontal_spacing": 16,
+    "grid_vertical_spacing": 16,
+    "button_radius": 0,
+    "card_radius": 8,
+    "buttons_border_thickness": "1",
+    "card_image_ratio": "portrait",
+    "card_show_vendor": true,
+    "card_show_second_image": true,
+    "card_show_badges": true,
+    "card_quick_add": true,
+    "card_color_scheme": "scheme-1",
+    "cart_type": "drawer",
+    "cart_show_note": true,
+    "cart_free_shipping": true,
+    "cart_free_shipping_threshold": 500,
+    "social_instagram": "https://instagram.com/bayramovcosmetics",
+    "social_facebook": "https://facebook.com/bayramovcosmetics",
+    "social_tiktok": "https://tiktok.com/@bayramovcosmetics",
+    "social_youtube": "",
+    "social_pinterest": "",
+    "social_twitter": "",
+    "contact_phone": "+90 500 000 00 00",
+    "contact_email": "info@bayramov.com",
+    "contact_address": "Bayramov Kozmetik, İstanbul, Türkiye",
+    "contact_hours": "Hafta içi 09:00 - 18:00"
+  },
+  "presets": {
+    "Default": {}
+  }
+}

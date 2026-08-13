@@ -1,0 +1,42 @@
+<section class="rich-text color-{{ section.settings.color_scheme }} section-padding" data-section-id="{{ section.id }}">
+  <div class="page-width">
+    <div class="rich-text__content rich-text--{{ section.settings.alignment }}">
+      {%- if section.settings.subheading != blank -%}
+        <p class="rich-text__subheading">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="rich-text__heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="rich-text__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+      {%- if section.settings.button_label != blank -%}
+        <div class="rich-text__buttons">
+          <a href="{{ section.settings.button_link | default: '#' }}" class="button button--primary">{{ section.settings.button_label }}</a>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Zengin Metin",
+  "tag": "section",
+  "class": "section-rich-text",
+  "settings": [
+    { "type": "select", "id": "alignment", "label": "Hizalama", "options": [
+      { "value": "left", "label": "Sol" }, { "value": "center", "label": "Orta" }
+    ], "default": "center" },
+    { "type": "text", "id": "subheading", "label": "Üst başlık" },
+    { "type": "text", "id": "heading", "label": "Başlık", "default": "Cildinize Değer Verin" },
+    { "type": "richtext", "id": "text", "label": "Metin", "default": "<p>Tüm ürünlerimiz vegan, kruelti-free ve dermatolojik olarak test edilmiştir.</p>" },
+    { "type": "text", "id": "button_label", "label": "Buton yazısı" },
+    { "type": "url", "id": "button_link", "label": "Buton bağlantısı" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Renk şeması", "default": "scheme-1" }
+  ],
+  "presets": [
+    { "name": "Zengin Metin" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,91 @@
+<section class="cart-page color-{{ section.settings.color_scheme }} section-padding" data-section-id="{{ section.id }}">
+  <div class="page-width">
+    <h1 class="cart-page__title">{{ 'cart.general.title' | t }}</h1>
+
+    {%- if cart.item_count == 0 -%}
+      <div class="cart-page__empty">
+        <p>{{ 'cart.general.empty' | t }}</p>
+        <a href="{{ routes.all_products_collection_url }}" class="button button--primary">{{ 'general.continue_shopping' | t }}</a>
+      </div>
+    {%- else -%}
+      {% form 'cart', cart, id: 'CartForm', class: 'cart-page__form' %}
+        <div class="cart-page__layout">
+          <div class="cart-page__items">
+            <table class="cart-table">
+              <thead>
+                <tr>
+                  <th>{{ 'cart.general.headings.product' | t }}</th>
+                  <th>{{ 'cart.general.headings.price' | t }}</th>
+                  <th>{{ 'cart.general.headings.quantity' | t }}</th>
+                  <th>{{ 'cart.general.headings.total' | t }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {%- for item in cart.items -%}
+                  <tr class="cart-table__row" data-cart-item data-key="{{ item.key }}">
+                    <td class="cart-table__product">
+                      <a href="{{ item.url }}" class="cart-table__image">
+                        {%- if item.image -%}
+                          <img src="{{ item.image | image_url: width: 200 }}" alt="{{ item.image.alt | escape }}" width="100" height="100" loading="lazy">
+                        {%- endif -%}
+                      </a>
+                      <div>
+                        <a href="{{ item.url }}" class="cart-table__title">{{ item.product.title }}</a>
+                        {%- unless item.product.has_only_default_variant -%}
+                          <p class="cart-table__variant">{{ item.variant.title }}</p>
+                        {%- endunless -%}
+                        <button type="button" class="cart-table__remove" data-cart-remove data-key="{{ item.key }}">{{ 'cart.general.remove' | t }}</button>
+                      </div>
+                    </td>
+                    <td class="cart-table__price" data-label="{{ 'cart.general.headings.price' | t }}">
+                      {%- if item.original_price != item.final_price -%}
+                        <s>{{ item.original_price | money }}</s> {{ item.final_price | money }}
+                      {%- else -%}
+                        {{ item.final_price | money }}
+                      {%- endif -%}
+                    </td>
+                    <td class="cart-table__quantity" data-label="{{ 'cart.general.headings.quantity' | t }}">
+                      <div class="quantity-input" data-quantity-input>
+                        <button type="button" class="quantity-input__button" data-cart-quantity-decrease data-key="{{ item.key }}" aria-label="{{ 'products.product.quantity.decrease' | t }}">{% render 'icon', icon: 'minus' %}</button>
+                        <input type="number" class="quantity-input__field" min="0" value="{{ item.quantity }}" data-cart-quantity-field data-key="{{ item.key }}" aria-label="{{ 'products.product.quantity.label' | t }}">
+                        <button type="button" class="quantity-input__button" data-cart-quantity-increase data-key="{{ item.key }}" aria-label="{{ 'products.product.quantity.increase' | t }}">{% render 'icon', icon: 'plus' %}</button>
+                      </div>
+                    </td>
+                    <td class="cart-table__total" data-label="{{ 'cart.general.headings.total' | t }}">{{ item.final_line_price | money }}</td>
+                  </tr>
+                {%- endfor -%}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="cart-page__summary">
+            {%- if settings.cart_show_note -%}
+              <div class="cart-page__note">
+                <label for="CartNote">{{ 'cart.general.note' | t }}</label>
+                <textarea name="note" id="CartNote" data-cart-note>{{ cart.note }}</textarea>
+              </div>
+            {%- endif -%}
+            <div class="cart-page__subtotal">
+              <span>{{ 'cart.general.subtotal' | t }}</span>
+              <span>{{ cart.total_price | money }}</span>
+            </div>
+            <p class="cart-page__shipping-note">{{ 'cart.general.shipping_at_checkout' | t }}</p>
+            <button type="submit" name="checkout" class="button button--primary button--full">{{ 'cart.general.checkout' | t }}</button>
+            <a href="{{ routes.all_products_collection_url }}" class="cart-page__continue">{{ 'general.continue_shopping' | t }}</a>
+          </div>
+        </div>
+      {% endform %}
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Sepet Sayfası",
+  "tag": "section",
+  "class": "section-main-cart",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Renk şeması", "default": "scheme-1" }
+  ]
+}
+{% endschema %}
