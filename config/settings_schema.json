@@ -38,12 +38,6 @@
           },
           {
             "type": "color",
-            "id": "background_gradient",
-            "label": "Arka plan gradyanı",
-            "default": ""
-          },
-          {
-            "type": "color",
             "id": "text",
             "label": "Metin",
             "default": "#2B2420"
@@ -93,12 +87,8 @@
         ],
         "role": {
           "text": "text",
-          "background": {
-            "solid": "background",
-            "gradient": "background_gradient"
-          },
+          "background": "background",
           "links": "link",
-          "icons": "text",
           "primary_button": "button",
           "on_primary_button": "button_label",
           "secondary_button": "secondary_button_background",
